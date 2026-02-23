@@ -90,15 +90,20 @@ with st.sidebar:
         elif tipo_vista == "Proveedor / Stand": seleccion = st.selectbox("🏢 SELECCIONAR STAND:", stands_nombres)
         else: seleccion = "CUADRANTE COMPLETO"
 
-# --- CABECERA ---
+# --- CABECERA (Versión para Nube) ---
 col_izq, col_cen, col_der = st.columns([1, 4, 1])
+
 with col_izq: 
-    if os.path.exists("logo_expool.png"): st.image("logo_expool.png", use_container_width=True)
+    # Asegúrate de que "logo_expool.png" esté subido a GitHub (ojo con las mayúsculas)
+    st.image("logo_expool.png", use_container_width=True)
+
 with col_cen:
     st.markdown('<p class="titulo-principal">EXPOOL 2026 · PASAPORTE MZB</p>', unsafe_allow_html=True)
-    if os.path.exists("juntos.png"): st.image("juntos.png", use_container_width=True)
+    # Asegúrate de que "juntos.png" esté subido a GitHub
+    st.image("juntos.png", use_container_width=True)
+
 with col_der: 
-    if os.path.exists("logo_expool.png"): st.image("logo_expool.png", use_container_width=True)
+    st.image("logo_expool.png", use_container_width=True)
 
 # --- LÓGICA DE VISTAS ---
 

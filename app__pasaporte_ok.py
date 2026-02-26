@@ -6,22 +6,22 @@ import os
 
 st.set_page_config(page_title="EXPOOL 2026 - Pasaporte MZB", layout="wide", page_icon="💧")
 
-# --- ESTILOS ---
+# --- CSS ESTILO NEGRO Y NARANJA (MEJORADO) ---
 st.markdown("""
     <style>
     .main { background-color: #000000; }
     body { background-color: #000000; color: white; }
     .titulo-principal {
-        color: #FF8C00; font-size: 28px !important; font-weight: 900 !important;
+        color: #FF8C00; font-size: 26px !important; font-weight: 900 !important;
         line-height: 1.1; text-transform: uppercase; text-align: center; margin-bottom: 10px;
     }
     .socio-card {
-        background-color: #111; padding: 15px; border-radius: 10px;
+        background-color: #111; padding: 12px; border-radius: 10px;
         color: #FF8C00; text-align: center; margin-bottom: 10px; border: 1px solid #FF8C00;
     }
-    .asamblea-card {
-        background-color: #111; padding: 15px; border-radius: 10px; 
-        border-left: 5px solid #FF8C00; color: white; margin-bottom: 10px;
+    .agenda-bloque {
+        background-color: #111; padding: 10px; border-radius: 8px;
+        border-left: 4px solid #FF8C00; margin-bottom: 5px; font-size: 14px;
     }
     [data-testid="stTable"] { width: 100% !important; font-size: 13px !important; color: white !important; }
     th { background-color: #FF8C00 !important; color: black !important; }
@@ -32,7 +32,7 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-# --- LISTADOS OFICIALES (38 MZB y 39 PROVEEDORES) ---
+# --- LISTADOS OFICIALES (ORDENADOS: AQUASERVEIS DETRÁS DE NEO SWIMMING) ---
 mzb_listado = [
     "AIGUANET GARDEN AND POOL", "AISLANTES AISLAMAX", "AIT", "AZ PISCINAS", "CIPAGUA",
     "OCIO JARDIN CARRETERO S.L.", "AQUAINDESA", "CALDARIUM", "CONSAN PISCINAS", "COSTA PISCINAS",
@@ -83,7 +83,7 @@ def generar_datos_feria(dia):
     else:
         # MAÑANA D2: 09:30 a 14:00
         curr = datetime.strptime("09:30", "%H:%M")
-        t_count = 30 # Offset para no repetir inicio
+        t_count = 15 # Offset para evitar repetición exacta
         while curr < datetime.strptime("14:00", "%H:%M"):
             f = {"Hora": curr.strftime("%H:%M"), "TIPO": "ROTACION"}
             for i, s in enumerate(mzb_listado):
@@ -112,7 +112,7 @@ with st.sidebar:
     if os.path.exists("logo_mzb.jpg"): st.image("logo_mzb.jpg", use_container_width=True)
     vista = st.radio("🔍 MENÚ:", ["AGENDA GENERAL", "MZB", "Proveedor / Stand", "🏛️ ASAMBLEA"])
     if vista != "🏛️ ASAMBLEA":
-        dia = st.selectbox("📅 JORNADA:", ["Día 1 (3 Marzo)", "Día 2 (4 Marzo)"])
+        dia_sel = st.selectbox("📅 JORNADA:", ["Día 1 (3 Marzo)", "Día 2 (4 Marzo)"])
         if vista == "MZB": sel = st.selectbox("👤 SOCIO:", mzb_listado)
         elif vista == "Proveedor / Stand": sel = st.selectbox("🏢 STAND:", prov_listado)
         else: sel = "CUADRANTE COMPLETO"
@@ -131,8 +131,28 @@ if vista == "🏛️ ASAMBLEA":
     col1, col2 = st.columns(2)
     with col1: st.markdown('<div class="asamblea-card"><h3>SESIÓN 1</h3>Lunes 2 Marzo - 16:00h</div>', unsafe_allow_html=True)
     with col2: st.markdown('<div class="asamblea-card"><h3>SESIÓN 2</h3>Jueves 5 Marzo - 10:00h</div>', unsafe_allow_html=True)
+
+elif vista == "AGENDA GENERAL":
+    df = generar_datos_feria(dia_sel)
+    st.markdown('<div class="socio-card"><h3>CUADRANTE GENERAL POR HORAS</h3></div>', unsafe_allow_html=True)
+    
+    # Exportación Excel para cuadrante completo
+    buf = io.BytesIO()
+    with pd.ExcelWriter(buf, engine='xlsxwriter') as wr:
+        df.drop(columns=["TIPO"]).to_excel(wr, index=False)
+    st.download_button("📥 DESCARGAR CUADRANTE COMPLETO (EXCEL)", buf.getvalue(), "Cuadrante_General.xlsx")
+
+    # Visualización amigable para móvil (Acordeones por hora)
+    for _, fila in df.iterrows():
+        with st.expander(f"⏰ {fila['Hora']}"):
+            if fila["TIPO"] == "EVENTO":
+                st.warning(f"**{fila[mzb_listado[0]]}**")
+            else:
+                for mzb in mzb_listado:
+                    st.write(f"🔹 **{mzb}**: {fila[mzb]}")
+
 else:
-    df = generar_datos_feria(dia)
+    df = generar_datos_feria(dia_sel)
     if vista == "MZB":
         res = df[["Hora", sel]].rename(columns={sel: "VISITA A:"})
     elif vista == "Proveedor / Stand":
@@ -143,15 +163,13 @@ else:
                 vis = next((s for s in mzb_listado if r[s] == sel), "☕ LIBRE")
                 v.append({"Hora": r["Hora"], "ESTADO": vis})
         res = pd.DataFrame(v)
-    else: res = df.drop(columns=["TIPO"])
 
-    # EXCEL
+    # Botón Excel Individual
     buf = io.BytesIO()
     with pd.ExcelWriter(buf, engine='xlsxwriter') as wr:
         res.to_excel(wr, index=False, startrow=3)
-        fmt = wr.book.add_format({'bold': True, 'font_color': '#FF8C00'})
-        wr.sheets['Sheet1'].write(0, 0, f"EXPOOL 2026 - {sel}", fmt)
-    st.download_button("📥 DESCARGAR EXCEL", buf.getvalue(), f"{sel}.xlsx")
+        wr.sheets['Sheet1'].write(0, 0, f"EXPOOL 2026 - {sel}", wr.book.add_format({'bold': True}))
+    st.download_button(f"📥 EXCEL: {sel}", buf.getvalue(), f"{sel}.xlsx")
     
     st.markdown(f'<div class="socio-card"><h3>{sel}</h3></div>', unsafe_allow_html=True)
     m = len(res) // 2 + 1

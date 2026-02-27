@@ -11,13 +11,18 @@ st.set_page_config(
     layout="wide", 
     page_icon="logo_mzb.jpg" if os.path.exists("logo_mzb.jpg") else "💧"
 )
-# --- CONTADOR XL CON EFECTO GLOW (ESTILO EXPOOL) ---
+# --- CONTADOR XL CORREGIDO (HORA EXACTA ESPAÑA) ---
 from datetime import datetime
 import pytz
 
-# Configuración del objetivo: 4 de Marzo a las 17:00
-meta_sorteo = datetime(2026, 3, 4, 17, 0, 0, tzinfo=pytz.timezone('Europe/Madrid'))
-ahora_ct = datetime.now(pytz.timezone('Europe/Madrid'))
+# 1. Forzamos la zona horaria de Madrid
+tz_madrid = pytz.timezone('Europe/Madrid')
+
+# 2. Creamos la meta y la hora actual con la MISMA zona horaria de forma explícita
+meta_sorteo = tz_madrid.localize(datetime(2026, 3, 4, 17, 0, 0))
+ahora_ct = datetime.now(tz_madrid)
+
+# 3. Cálculo de la diferencia
 diferencia = meta_sorteo - ahora_ct
 
 if diferencia.total_seconds() > 0:
@@ -25,7 +30,7 @@ if diferencia.total_seconds() > 0:
     horas, rem = divmod(diferencia.seconds, 3600)
     minutos, _ = divmod(rem, 60)
     
-    # Cambio de color si faltan menos de 2 horas (7200 segundos)
+    # Lógica de colores (Naranja -> Rojo si faltan < 2 horas)
     es_urgente = diferencia.total_seconds() < 7200
     color_principal = "#FF0000" if es_urgente else "#FF8C00"
     sombra_glow = "0px 0px 20px rgba(255, 0, 0, 0.6)" if es_urgente else "0px 0px 15px rgba(255, 140, 0, 0.4)"
@@ -63,12 +68,7 @@ if diferencia.total_seconds() > 0:
         </div>
     """, unsafe_allow_html=True)
 else:
-    st.markdown("""
-        <div style="background: linear-gradient(90deg, #FF8C00, #FF4500); padding: 30px; border-radius: 20px; text-align: center; color: black;">
-            <h1 style="margin:0; font-size: 40px;">🎰 ¡SORTEO EN CURSO! 🎰</h1>
-            <p style="font-weight: bold; font-size: 20px;">¡Mucha suerte a todos los socios!</p>
-        </div>
-    """, unsafe_allow_html=True)
+    st.markdown('<div class="status-box">🎰 ¡SORTEO EN CURSO! 🎰</div>', unsafe_allow_html=True)
 # --- CSS ESTILO ULTRA TOP ---
 st.markdown("""
     <style>
@@ -301,6 +301,7 @@ else: # MZB o Proveedor
     buf = io.BytesIO()
     with pd.ExcelWriter(buf, engine='xlsxwriter') as wr: res.to_excel(wr, index=False)
     st.download_button("📥 DESCARGAR EXCEL", buf.getvalue(), f"{sel}.xlsx")
+
 
 
 

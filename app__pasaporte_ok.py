@@ -167,11 +167,10 @@ with st.sidebar:
             
             def generar_excel_por_proveedor():
                 output = io.BytesIO()
-                # 1. Obtenemos las tablas maestras de los socios
                 df1 = generar_datos_feria("Día 1 (3 Marzo)")
                 df2 = generar_datos_feria("Día 2 (4 Marzo)")
                 
-                # 2. Lista oficial de socios (MZB) que me has pasado
+                # Lista de socios MZB actualizada
                 socios_mzb = [
                     "AIGUANET GARDEN AND POOL", "AISLANTES AISLAMAX", "AIT", "AZ PISCINAS", "CIPAGUA",
                     "OCIO JARDIN CARRETERO S.L.", "AQUAINDESA", "CALDARIUM", "CONSAN PISCINAS", "COSTA PISCINAS",
@@ -184,50 +183,49 @@ with st.sidebar:
                 ]
 
                 with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
-                    # Iteramos por cada proveedor de tu lista oficial (prov_listado)
+                    # Buscamos la columna de tiempo (la primera de la tabla)
+                    col_hora_d1 = df1.columns[0]
+                    col_hora_d2 = df2.columns[0]
+                    horas = df1[col_hora_d1].unique()
+
                     for proveedor in prov_listado:
                         agenda_prov = []
-                        
-                        # Buscamos en cada hora qué socio visita a este proveedor
-                        for hora in df1['HORA'].unique():
+                        for h in horas:
                             # Día 1
                             socio_d1 = ""
-                            fila_d1 = df1[df1['HORA'] == hora]
+                            f1 = df1[df1[col_hora_d1] == h]
                             for s in socios_mzb:
-                                if s in fila_d1.columns and fila_d1[s].iloc[0] == proveedor:
+                                if s in f1.columns and str(f1[s].iloc[0]) == str(proveedor):
                                     socio_d1 = s
                                     break
-                            
                             # Día 2
                             socio_d2 = ""
-                            fila_d2 = df2[df2['HORA'] == hora]
+                            f2 = df2[df2[col_hora_d2] == h]
                             for s in socios_mzb:
-                                if s in fila_d2.columns and fila_d2[s].iloc[0] == proveedor:
+                                if s in f2.columns and str(f2[s].iloc[0]) == str(proveedor):
                                     socio_d2 = s
                                     break
                             
                             agenda_prov.append({
-                                'HORA': hora,
-                                'DÍA 1 (Socio)': socio_d1,
-                                'HORA ': hora, # Espacio para que no se repita nombre de columna
-                                'DÍA 2 (Socio)': socio_d2
+                                'HORA': h,
+                                'DÍA 1 (Visita)': socio_d1,
+                                'HORA ': h,
+                                'DÍA 2 (Visita)': socio_d2
                             })
                         
-                        df_pesteña = pd.DataFrame(agenda_prov)
-                        
-                        # Limpiar nombre de pestaña
-                        sh_name = str(proveedor)[:30].strip().replace('/','-').replace(':','').replace('*','')
-                        df_pesteña.to_excel(writer, sheet_name=sh_name, index=False)
+                        df_sheet = pd.DataFrame(agenda_prov)
+                        sh_name = str(proveedor)[:30].strip().replace('/','-')
+                        df_sheet.to_excel(writer, sheet_name=sh_name, index=False)
                 
                 return output.getvalue()
 
             st.download_button(
-                label="📥 DESCARGAR PLANING POR PROVEEDORES (Pestañas)",
+                label="📥 DESCARGAR PLANING PROVEEDORES",
                 data=generar_excel_por_proveedor(),
-                file_name="PLANING_PROVEEDORES_DETALLADO.xlsx",
+                file_name="PLANING_PROVEEDORES_EXPOOL.xlsx",
                 mime="application/vnd.ms-excel",
                 use_container_width=True,
-                key="btn_prov_pestañas"
+                key="btn_prov_final_fixed"
             )
 # --- VISTAS ---
 if vista == "🆘 AYUDA ZB":
@@ -309,6 +307,7 @@ else: # MZB o Proveedor
     buf = io.BytesIO()
     with pd.ExcelWriter(buf, engine='xlsxwriter') as wr: res.to_excel(wr, index=False)
     st.download_button("📥 DESCARGAR EXCEL", buf.getvalue(), f"{sel}.xlsx")
+
 
 
 

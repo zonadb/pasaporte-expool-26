@@ -165,34 +165,70 @@ with st.sidebar:
         if pwd_admin == "cipoteboys":
             st.success("✅ Acceso Concedido")
             
-            # 1. Generamos los datos tal cual los pinta la App en pantalla
-            df_d1_raw = generar_datos_feria("Día 1 (3 Marzo)")
-            df_d2_raw = generar_datos_feria("Día 2 (4 Marzo)")
+            def generar_excel_por_proveedor():
+                output = io.BytesIO()
+                # 1. Obtenemos las tablas maestras de los socios
+                df1 = generar_datos_feria("Día 1 (3 Marzo)")
+                df2 = generar_datos_feria("Día 2 (4 Marzo)")
+                
+                # 2. Lista oficial de socios (MZB) que me has pasado
+                socios_mzb = [
+                    "AIGUANET GARDEN AND POOL", "AISLANTES AISLAMAX", "AIT", "AZ PISCINAS", "CIPAGUA",
+                    "OCIO JARDIN CARRETERO S.L.", "AQUAINDESA", "CALDARIUM", "CONSAN PISCINAS", "COSTA PISCINAS",
+                    "GRIFONSUR", "GUADALOPE PISCINAS", "HERMONT", "HIDRAULICA AGUA CLARA", "IPOOL CENTER",
+                    "JUBERT & VILA", "KAU PISCINAS", "MANEIG PISCINES", "NAVARRO A.T.H", "ALELLA PISCINAS",
+                    "NEW CHEM", "AQUASERVEIS", "AQUASERVEIS REUS", "PISCIBLUE", "PISCINAS DE LA FLOR",
+                    "PISCINAS JESUS", "INSTALACIONES PISCINAS JESUS", "PISCINAS LOS BALCONES S.L.U.", "PISCINAS PILIO",
+                    "PISCINES CENTER", "PISCINES GELMI", "PISCINES PIERA", "PISCISALUD", "POOLMARK",
+                    "SHOP LINER POOL", "SILLERO E HIJOS SL", "TECNODRY"
+                ]
 
-            # 2. Forzamos a que las columnas sean texto limpio (quitar espacios raros)
-            df_d1_raw.columns = [str(c).strip() for c in df_d1_raw.columns]
-            df_d2_raw.columns = [str(c).strip() for c in df_d2_raw.columns]
+                with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
+                    # Iteramos por cada proveedor de tu lista oficial (prov_listado)
+                    for proveedor in prov_listado:
+                        agenda_prov = []
+                        
+                        # Buscamos en cada hora qué socio visita a este proveedor
+                        for hora in df1['HORA'].unique():
+                            # Día 1
+                            socio_d1 = ""
+                            fila_d1 = df1[df1['HORA'] == hora]
+                            for s in socios_mzb:
+                                if s in fila_d1.columns and fila_d1[s].iloc[0] == proveedor:
+                                    socio_d1 = s
+                                    break
+                            
+                            # Día 2
+                            socio_d2 = ""
+                            fila_d2 = df2[df2['HORA'] == hora]
+                            for s in socios_mzb:
+                                if s in fila_d2.columns and fila_d2[s].iloc[0] == proveedor:
+                                    socio_d2 = s
+                                    break
+                            
+                            agenda_prov.append({
+                                'HORA': hora,
+                                'DÍA 1 (Socio)': socio_d1,
+                                'HORA ': hora, # Espacio para que no se repita nombre de columna
+                                'DÍA 2 (Socio)': socio_d2
+                            })
+                        
+                        df_pesteña = pd.DataFrame(agenda_prov)
+                        
+                        # Limpiar nombre de pestaña
+                        sh_name = str(proveedor)[:30].strip().replace('/','-').replace(':','').replace('*','')
+                        df_pesteña.to_excel(writer, sheet_name=sh_name, index=False)
+                
+                return output.getvalue()
 
-            # --- BOTÓN EXCEL COMPLETO (SOCIOS Y PROVEEDORES) ---
-            # Unimos los dos días. Esto crea un Excel con TODOS los nombres
-            df_maestro = pd.concat([df_d1_raw.reset_index(drop=True), 
-                                   df_d2_raw.reset_index(drop=True)], axis=1)
-
-            out_total = io.BytesIO()
-            with pd.ExcelWriter(out_total, engine='xlsxwriter') as writer:
-                df_maestro.to_excel(writer, sheet_name='PLANING_EXPOOL_2026', index=False)
-            
-            st.write("📂 **Descarga Directa:**")
             st.download_button(
-                label="📥 DESCARGAR CUADRANTE MAESTRO (SOCIOS Y STANDS)",
-                data=out_total.getvalue(),
-                file_name="AGENDA_COMPLETA_EXPOOL.xlsx",
+                label="📥 DESCARGAR PLANING POR PROVEEDORES (Pestañas)",
+                data=generar_excel_por_proveedor(),
+                file_name="PLANING_PROVEEDORES_DETALLADO.xlsx",
                 mime="application/vnd.ms-excel",
                 use_container_width=True,
-                key="btn_maestro_total"
+                key="btn_prov_pestañas"
             )
-            
-            st.info("💡 Este archivo contiene todas las columnas de la feria. Puedes usar el buscador de Excel (Ctrl+F) para encontrar cualquier Socio o Proveedor rápidamente.")
 # --- VISTAS ---
 if vista == "🆘 AYUDA ZB":
     st.markdown('<div class="socio-card"><h2>🆘 AYUDA EXPOOL</h2></div>', unsafe_allow_html=True)
@@ -273,6 +309,7 @@ else: # MZB o Proveedor
     buf = io.BytesIO()
     with pd.ExcelWriter(buf, engine='xlsxwriter') as wr: res.to_excel(wr, index=False)
     st.download_button("📥 DESCARGAR EXCEL", buf.getvalue(), f"{sel}.xlsx")
+
 
 
 

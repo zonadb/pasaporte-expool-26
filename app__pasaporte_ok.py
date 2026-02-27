@@ -6,7 +6,11 @@ import os
 import pytz # Librería para zonas horarias
 
 # Configuración
-st.set_page_config(page_title="EXPOOL 2026 - Pasaporte MZB", layout="wide", page_icon="💧")
+st.set_page_config(
+    page_title="EXPOOL 2026 - Pasaporte MZB", 
+    layout="wide", 
+    page_icon="logo_mzb.jpg" # <--- Esto cambia la gota por vuestro logo real
+)
 
 # --- CSS ESTILO "ULTRA TOP" ---
 st.markdown("""
@@ -196,6 +200,7 @@ else: # MZB o Proveedor
     buf = io.BytesIO()
     with pd.ExcelWriter(buf, engine='xlsxwriter') as wr: res.to_excel(wr, index=False)
     st.download_button("📥 DESCARGAR EXCEL", buf.getvalue(), f"{sel}.xlsx")
+
 
 
 

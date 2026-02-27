@@ -3,12 +3,16 @@ import pandas as pd
 from datetime import datetime, timedelta
 import io
 import os
-import pytz # Librería para zonas horarias
+import pytz
 
-# Configuración
-st.set_page_config(page_title="EXPOOL 2026 - Pasaporte MZB", layout="wide", page_icon="💧")
+# 1. CONFIGURACIÓN TOP (Logo en la pestaña)
+st.set_page_config(
+    page_title="EXPOOL 2026 - Pasaporte MZB", 
+    layout="wide", 
+    page_icon="logo_mzb.jpg" if os.path.exists("logo_mzb.jpg") else "💧"
+)
 
-# --- CSS ESTILO "ULTRA TOP" ---
+# --- CSS ESTILO ULTRA TOP ---
 st.markdown("""
     <style>
     .main { background-color: #000000; }
@@ -21,11 +25,14 @@ st.markdown("""
         background: linear-gradient(90deg, #FF8C00, #FF4500);
         color: black; padding: 15px; border-radius: 12px;
         text-align: center; font-weight: bold; font-size: 18px; margin-bottom: 20px;
-        box-shadow: 0px 4px 15px rgba(255, 140, 0, 0.3);
     }
     .socio-card {
         background-color: #111; padding: 12px; border-radius: 10px;
         color: #FF8C00; text-align: center; margin-bottom: 10px; border: 1px solid #FF8C00;
+    }
+    .asamblea-card {
+        background-color: #111; padding: 15px; border-radius: 10px; 
+        border-left: 4px solid #FF8C00; color: white; margin-bottom: 10px;
     }
     .stDownloadButton button, .stLinkButton a {
         background-color: #FF8C00 !important; color: black !important;
@@ -34,8 +41,27 @@ st.markdown("""
     }
     [data-testid="stTable"] { width: 100% !important; color: white !important; }
     th { background-color: #FF8C00 !important; color: black !important; }
+    .alergia-box {
+        background-color: #330000; color: #FF4B4B; padding: 15px; 
+        border-radius: 10px; border: 1px solid #FF4B4B; text-align: center;
+    }
     </style>
     """, unsafe_allow_html=True)
+
+# --- MENSAJE DE BIENVENIDA (MODAL) ---
+@st.dialog("🚀 ¡BIENVENIDO A EXPOOL 2026!")
+def bienvenida():
+    st.write("Para una experiencia **TOP**, instala esta App en tu móvil:")
+    st.markdown("""
+    * **iPhone:** Pulsa el botón compartir (cuadrado con flecha) y elige **'Añadir a pantalla de inicio'**.
+    * **Android:** Pulsa los 3 puntos y elige **'Instalar aplicación'**.
+    """)
+    if st.button("¡Entendido!"):
+        st.session_state.visto = True
+        st.rerun()
+
+if 'visto' not in st.session_state:
+    bienvenida()
 
 # --- LISTADOS ---
 mzb_listado = [
@@ -43,7 +69,7 @@ mzb_listado = [
     "OCIO JARDIN CARRETERO S.L.", "AQUAINDESA", "CALDARIUM", "CONSAN PISCINAS", "COSTA PISCINAS",
     "GRIFONSUR", "GUADALOPE PISCINAS", "HERMONT", "HIDRAULICA AGUA CLARA", "IPOOL CENTER",
     "JUBERT & VILA", "KAU PISCINAS", "MANEIG PISCINES", "NAVARRO A.T.H", "ALELLA PISCINAS",
-    "NEW CHEM", "AQUASERVEIS", "AQUASERVEIS REUS", "PISCIBLUE", "PISCINAS DE LA FLOR",
+    "NEW CHEM", "NEO SWIMMING", "AQUASERVEIS REUS", "PISCIBLUE", "PISCINAS DE LA FLOR",
     "PISCINAS JESUS", "INSTALACIONES PISCINAS JESUS", "PISCINAS LOS BALCONES S.L.U.", "PISCINAS PILIO",
     "PISCINES CENTER", "PISCINES GELMI", "PISCINES PIERA", "PISCISALUD", "POOLMARK",
     "SHOP LINER POOL", "SILLERO E HIJOS SL", "TECNODRY"
@@ -90,7 +116,7 @@ def generar_datos_feria(dia):
         filas.append({"Hora": "17:00", "TIPO": "EVENTO", **{s: "🎰 SORTEO PROVEEDORES" for s in mzb_listado}})
     return pd.DataFrame(filas)
 
-# --- LÓGICA DE TIEMPO REAL (ZONA HORARIA MADRID) ---
+# --- LÓGICA DE TIEMPO REAL (ZONA MADRID) ---
 tz = pytz.timezone('Europe/Madrid')
 ahora = datetime.now(tz)
 hora_str = ahora.strftime("%H:%M")
@@ -100,7 +126,6 @@ def obtener_estado_actual(nombre, es_mzb):
     if hoy_str == "03/03": df_hoy = generar_datos_feria("Día 1 (3 Marzo)")
     elif hoy_str == "04/03": df_hoy = generar_datos_feria("Día 2 (4 Marzo)")
     else: return "⏳ PRÓXIMAMENTE: EXPOOL 2026 (3-4 MARZO)"
-
     for i in range(len(df_hoy)-1):
         h_actual = df_hoy.iloc[i]["Hora"]
         h_siguiente = df_hoy.iloc[i+1]["Hora"]
@@ -122,48 +147,39 @@ with st.sidebar:
 
 # --- CABECERA ---
 c1, c2, c3 = st.columns([1, 4, 1])
-with c1: st.image("portada.jpg", use_container_width=True)
+with c1: 
+    if os.path.exists("portada.jpg"): st.image("portada.jpg", use_container_width=True)
 with c2: 
     st.markdown('<p class="titulo-principal">EXPOOL 2026<br>PASAPORTE MZB</p>', unsafe_allow_html=True)
-    st.image("juntos.png", use_container_width=True)
-with c3: st.image("planing_mzb.jpg", use_container_width=True)
+    if os.path.exists("juntos.png"): st.image("juntos.png", use_container_width=True)
+with c3: 
+    if os.path.exists("portada.jpg"): st.image("portada.jpg", use_container_width=True)
 
 # --- VISTAS ---
 if vista == "🆘 AYUDA ZB":
     st.markdown('<div class="socio-card"><h2>🆘 AYUDA EXPOOL</h2></div>', unsafe_allow_html=True)
     st.link_button("💬 WHATSAPP ORGANIZACIÓN", "https://wa.me/34670379925?text=Hola%20Claudia,%20necesito%20ayuda...")
+
 elif vista == "🗺️ PLANO FERIA":
-    st.image("plano.jpg", use_container_width=True)
+    if os.path.exists("plano.jpg"): st.image("plano.jpg", use_container_width=True)
+
 elif vista == "🎉 MENÚS Y OCIO":
-    st.image("ocio.jpg", use_container_width=True)
+    if os.path.exists("ocio.jpg"): st.image("ocio.jpg", use_container_width=True)
+    st.markdown('<div class="alergia-box">⚠️ Avisa de alergias a Claudia.</div>', unsafe_allow_html=True)
     st.link_button("📲 AVISAR ALERGIAS", "https://wa.me/34670379925?text=Tengo%20una%20alergia...")
+
 elif vista == "🏛️ ASAMBLEA":
-    st.markdown('<div class="socio-card"><h2 style="margin:0;">🏛️ ASAMBLEA GENERAL</h2><p style="margin:0; color: white;">GRUPO ZONA DE BAÑO S.COOP.</p></div>', unsafe_allow_html=True)
-    st.info("📍 UBICACIÓN: Edificio Multiusos de Amposta (Frente al Recinto Ferial)")
-    
-    c1, c2 = st.columns(2)
-    with c1:
-        st.markdown("""<div class="asamblea-card">
-            <h3 style="color: #FF8C00;">📅 SESIÓN 1</h3><p><b>Lunes 2 de Marzo</b></p>
-            <p><small>16:00h (2ª convocatoria)</small></p><hr>
-            <ul style="list-style-type: none; padding-left: 0; font-size: 13px;">
-                <li><b>1.</b> Bienvenida Presidente y Consejo.</li>
-                <li><b>2.</b> ALTAS y BAJAS Grupo ZB 2026.</li>
-                <li><b>3.</b> Actividades FERIA EXPOOL 2026.</li>
-                <li><b>4.</b> COMPRAS a PROVEEDORES 2025.</li>
-                <li><b>5.</b> PROVEEDORES 2026 y ZB AQUANATUR.</li>
-            </ul></div>""", unsafe_allow_html=True)
-    with c2:
-        st.markdown("""<div class="asamblea-card">
-            <h3 style="color: #FF8C00;">📅 SESIÓN 2</h3><p><b>Jueves 5 de Marzo</b></p>
-            <p><small>10:00h (2ª convocatoria)</small></p><hr>
-            <ul style="list-style-type: none; padding-left: 0; font-size: 13px;">
-                <li><b>6.</b> FIGURA SOCIO Y RAPPEL 2025.</li>
-                <li><b>7.</b> PROGRAMA ZB PLATINUM 2026.</li>
-                <li><b>8.</b> MARKETING, WEB y RR.SS.</li>
-                <li><b>9.</b> NUEVO CATÁLOGO ZB 2026-27.</li>
-                <li><b>10.</b> Ruegos y Preguntas.</li>
-            </ul></div>""", unsafe_allow_html=True)
+    st.markdown('<div class="socio-card"><h2 style="margin:0;">🏛️ ASAMBLEA GENERAL</h2><p style="margin:0; color: white;">ACCESO RESTRINGIDO A SOCIOS</p></div>', unsafe_allow_html=True)
+    password = st.text_input("Introduce la clave de Socio:", type="password")
+    if password == "ZB2026":
+        st.success("✅ Acceso concedido")
+        st.info("📍 UBICACIÓN: Edificio Multiusos de Amposta")
+        col1, col2 = st.columns(2)
+        with col1:
+            st.markdown("""<div class="asamblea-card"><h3 style="color: #FF8C00;">📅 SESIÓN 1</h3><p><b>Lunes 2 de Marzo</b></p><p><small>15:30h (1ª) | 16:00h (2ª)</small></p><hr><ul style="list-style-type: none; padding-left: 0; font-size: 13px;"><li><b>1.</b> Bienvenida.</li><li><b>2.</b> Altas/Bajas.</li><li><b>3.</b> Feria Expool.</li><li><b>4.</b> Compras 2025.</li><li><b>5.</b> Proveedores 2026.</li></ul></div>""", unsafe_allow_html=True)
+        with col2:
+            st.markdown("""<div class="asamblea-card"><h3 style="color: #FF8C00;">📅 SESIÓN 2</h3><p><b>Jueves 5 de Marzo</b></p><p><small>09:30h (1ª) | 10:00h (2ª)</small></p><hr><ul style="list-style-type: none; padding-left: 0; font-size: 13px;"><li><b>6.</b> Rappel 2025.</li><li><b>7.</b> Platinum 2026.</li><li><b>8.</b> Marketing/Web.</li><li><b>9.</b> Catálogo 26-27.</li><li><b>10.</b> Ruegos.</li></ul></div>""", unsafe_allow_html=True)
+
 elif vista == "AGENDA GENERAL":
     df = generar_datos_feria(dia_sel)
     for _, fila in df.iterrows():
@@ -171,6 +187,7 @@ elif vista == "AGENDA GENERAL":
             if fila["TIPO"] == "EVENTO": st.warning(fila[mzb_listado[0]])
             else:
                 for mzb in mzb_listado: st.write(f"🔹 {mzb} ➔ {fila[mzb]}")
+
 else: # MZB o Proveedor
     estado = obtener_estado_actual(sel, vista == "MZB")
     st.markdown(f'<div class="status-box">{estado}</div>', unsafe_allow_html=True)
@@ -186,6 +203,3 @@ else: # MZB o Proveedor
     buf = io.BytesIO()
     with pd.ExcelWriter(buf, engine='xlsxwriter') as wr: res.to_excel(wr, index=False)
     st.download_button("📥 DESCARGAR EXCEL", buf.getvalue(), f"{sel}.xlsx")
-
-
-

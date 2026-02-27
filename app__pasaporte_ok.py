@@ -144,8 +144,23 @@ def obtener_estado_actual(nombre, es_mzb):
                 return f"📍 RECIBIENDO A: {visita}"
     return "😴 FERIA CERRADA POR HOY"
 
-# --- SIDEBAR (BORRA CUALQUIER OTRA COPIA DE ESTO QUE TENGAS) ---
-with st.expander("🔐 ACCESO ORGANIZACIÓN"):
+# --- SIDEBAR ---
+with st.sidebar:
+    # 1. El Logo
+    if os.path.exists("logo_mzb.jpg"): 
+        st.image("logo_mzb.jpg", use_container_width=True)
+    
+    # 2. Definimos 'vista' (ESTA LÍNEA ES LA QUE FALTA O ESTÁ MAL PUESTA)
+    vista = st.radio("🔍 MENÚ:", ["AGENDA GENERAL", "MZB", "Proveedor / Stand", "🏛️ ASAMBLEA", "🗺️ PLANO FERIA", "🎉 MENÚS Y OCIO", "🆘 AYUDA ZB"], key="menu_principal")
+    
+    # 3. Selectores condicionales
+    if vista not in ["🏛️ ASAMBLEA", "🗺️ PLANO FERIA", "🎉 MENÚS Y OCIO", "🆘 AYUDA ZB"]:
+        dia_sel = st.selectbox("📅 JORNADA:", ["Día 1 (3 Marzo)", "Día 2 (4 Marzo)"])
+        sel = st.selectbox("👤 SELECCIONA NOMBRE:", mzb_listado if vista == "MZB" else prov_listado)
+        st.divider()
+
+    # 4. Zona de Administración (con el Excel de 2 columnas)
+    with st.expander("🔐 ACCESO ORGANIZACIÓN"):
         pwd_admin = st.text_input("Clave Admin:", type="password")
         if pwd_admin == "cipoteboys":
             st.write("### 📂 Generar Listados Maestros")
@@ -172,7 +187,7 @@ with st.expander("🔐 ACCESO ORGANIZACIÓN"):
                 return output.getvalue()
 
             st.download_button(
-                label="📥 DESCARGAR PLANING COMPLETO (Pestañas)",
+                label="📥 DESCARGAR PLANING COMPLETO",
                 data=descargar_excel_seguro(),
                 file_name="PLANING_EXPOOL_2026.xlsx",
                 mime="application/vnd.ms-excel",
@@ -279,6 +294,7 @@ else: # MZB o Proveedor
     buf = io.BytesIO()
     with pd.ExcelWriter(buf, engine='xlsxwriter') as wr: res.to_excel(wr, index=False)
     st.download_button("📥 DESCARGAR EXCEL", buf.getvalue(), f"{sel}.xlsx")
+
 
 
 

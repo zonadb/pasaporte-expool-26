@@ -5,63 +5,50 @@ import io
 import os
 import pytz
 
-# 1. CONFIGURACIÓN TOP (Logo en la pestaña)
-st.set_page_config)
-    
-# --- TÍTULO CON EFECTO NEÓN / BACKLIGHT (ESTILO UNIVERSAL) ---
+# 1. CONFIGURACIÓN DE PÁGINA (Sintaxis corregida)
+st.set_page_config(
+    page_title="EXPOOL 2026 - Pasaporte MZB", 
+    layout="wide", 
+    page_icon="logo_mzb.jpg"
+)
+
+# 2. TÍTULO ESTILO UNIVERSAL CON ILUMINACIÓN POSTERIOR
 st.markdown("""
     <style>
-    /* Definimos la animación de parpadeo suave */
-    @keyframes neon-shine {
-        0% { opacity: 1; text-shadow: 0 0 10px #FF8C00, 0 0 20px #FF8C00, 0 0 30px #FF4500; }
-        50% { opacity: 0.9; text-shadow: 0 0 15px #FF8C00, 0 0 30px #FF8C00, 0 0 45px #FF4500; }
-        100% { opacity: 1; text-shadow: 0 0 10px #FF8C00, 0 0 20px #FF8C00, 0 0 30px #FF4500; }
+    @keyframes neon-glow {
+        0% { text-shadow: 0 0 10px #FF8C00, 0 0 20px #FF8C00, 0 0 30px #FF4500; }
+        50% { text-shadow: 0 0 15px #FF8C00, 0 0 35px #FF8C00, 0 0 50px #FF4500; }
+        100% { text-shadow: 0 0 10px #FF8C00, 0 0 20px #FF8C00, 0 0 30px #FF4500; }
     }
-
     .titulo-universal {
-        background-color: transparent;
-        color: white; /* Color de la letra */
-        font-family: 'Arial Black', Gadget, sans-serif; /* Fuente gruesa */
-        font-size: 3.5rem; /* Tamaño extra grande */
+        color: white;
+        font-family: 'Arial Black', sans-serif;
+        font-size: 3.2rem;
         font-weight: 900;
         text-transform: uppercase;
         text-align: center;
-        line-height: 1;
-        margin-top: 20px;
-        margin-bottom: 5px;
-        letter-spacing: 4px; /* Espaciado entre letras cinematográfico */
-        
-        /* EL EFECTO: Múltiples sombras para crear el backlight */
-        text-shadow: 
-            0 0 10px #FF8C00, /* Brillo naranja fuerte */
-            0 0 20px #FF8C00, 
-            0 0 30px #FF4500, /* Brillo rojo-naranja más suave y profundo */
-            0 0 40px #FF4500;
-            
-        /* ANIMACIÓN: Pulso suave para dar vida */
-        animation: neon-shine 3s infinite;
+        margin-top: 10px;
+        margin-bottom: 0px;
+        letter-spacing: 4px;
+        animation: neon-glow 3s infinite;
     }
-
     .subtitulo-universal {
         color: #FF8C00;
-        font-size: 1.2rem;
+        font-size: 1.1rem;
         font-weight: bold;
         text-transform: uppercase;
         text-align: center;
-        letter-spacing: 10px; /* Muy espaciado para estilo elegante */
-        margin-bottom: 30px;
-        opacity: 0.8;
+        letter-spacing: 10px;
+        margin-bottom: 20px;
     }
     </style>
-    
     <div>
         <h1 class="titulo-universal">EXPOOL 2026</h1>
         <p class="subtitulo-universal">PASAPORTE MZB</p>
     </div>
     """, unsafe_allow_html=True)
-    layout="wide", 
-    page_icon="logo_mzb.jpg" if os.path.exists("logo_mzb.jpg") else "💧"
-)
+
+# --- CONTINÚA AQUÍ CON TU CABECERA DE IMÁGENES Y CONTADOR ---
 # --- CONTADOR XL CORREGIDO (HORA EXACTA ESPAÑA) ---
 from datetime import datetime
 import pytz
@@ -352,6 +339,7 @@ else: # MZB o Proveedor
     buf = io.BytesIO()
     with pd.ExcelWriter(buf, engine='xlsxwriter') as wr: res.to_excel(wr, index=False)
     st.download_button("📥 DESCARGAR EXCEL", buf.getvalue(), f"{sel}.xlsx")
+
 
 
 

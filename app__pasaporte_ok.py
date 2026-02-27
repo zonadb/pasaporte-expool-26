@@ -151,6 +151,26 @@ with st.sidebar:
     if vista not in ["🏛️ ASAMBLEA", "🗺️ PLANO FERIA", "🎉 MENÚS Y OCIO", "🆘 AYUDA ZB"]:
         dia_sel = st.selectbox("📅 JORNADA:", ["Día 1 (3 Marzo)", "Día 2 (4 Marzo)"])
         sel = st.selectbox("👤 SELECCIONA NOMBRE:", mzb_listado if vista == "MZB" else prov_listado)
+        st.divider()
+    with st.expander("🔐 ACCESO ORGANIZACIÓN"):
+        pwd_admin = st.text_input("Clave Admin:", type="password")
+        if pwd_admin == "EXPOOL2026":
+            st.write("Generar backup completo:")
+            df_d1 = generar_datos_feria("Día 1 (3 Marzo)")
+            df_d2 = generar_datos_feria("Día 2 (4 Marzo)")
+            
+            output = io.BytesIO()
+            with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
+                df_d1.to_excel(writer, sheet_name='Lunes 3 Marzo', index=False)
+                df_d2.to_excel(writer, sheet_name='Martes 4 Marzo', index=False)
+                
+            st.download_button(
+                label="📥 DESCARGAR PLANING TOTAL",
+                data=output.getvalue(),
+                file_name="Backup_TOTAL_Expool.xlsx",
+                mime="application/vnd.ms-excel",
+                use_container_width=True
+            )
 
 # --- CABECERA ---
 c1, c2, c3 = st.columns([1, 4, 1])
@@ -242,6 +262,7 @@ else: # MZB o Proveedor
     buf = io.BytesIO()
     with pd.ExcelWriter(buf, engine='xlsxwriter') as wr: res.to_excel(wr, index=False)
     st.download_button("📥 DESCARGAR EXCEL", buf.getvalue(), f"{sel}.xlsx")
+
 
 
 

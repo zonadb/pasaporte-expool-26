@@ -155,22 +155,51 @@ with st.sidebar:
     with st.expander("🔐 ACCESO ORGANIZACIÓN"):
         pwd_admin = st.text_input("Clave Admin:", type="password")
         if pwd_admin == "cipoteboys":
-            st.write("Generar backup completo:")
-            df_d1 = generar_datos_feria("Día 1 (3 Marzo)")
-            df_d2 = generar_datos_feria("Día 2 (4 Marzo)")
+            st.write("### 📂 Generar Listados Maestros")
             
-            output = io.BytesIO()
-            with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
-                df_d1.to_excel(writer, sheet_name='Lunes 3 Marzo', index=False)
-                df_d2.to_excel(writer, sheet_name='Martes 4 Marzo', index=False)
+            # --- FUNCIÓN INTERNA PARA CREAR EL FORMATO COMPACTO ---
+            def generar_excel_compacto(lista_nombres, tipo):
+                output = io.BytesIO()
+                df_d1 = generar_datos_feria("Día 1 (3 Marzo)")
+                df_d2 = generar_datos_feria("Día 2 (4 Marzo)")
                 
-            st.download_button(
-                label="📥 DESCARGAR PLANING TOTAL",
-                data=output.getvalue(),
-                file_name="Backup_TOTAL_Expool.xlsx",
-                mime="application/vnd.ms-excel",
-                use_container_width=True
-            )
+                with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
+                    for nombre in lista_nombres:
+                        # Extraemos las visitas de cada día
+                        v_d1 = df_d1[['HORA', nombre]].rename(columns={nombre: 'DÍA 1 (3 Marzo)'})
+                        v_d2 = df_d2[['HORA', nombre]].rename(columns={nombre: 'DÍA 2 (4 Marzo)'})
+                        
+                        # Unimos en dos columnas (una al lado de la otra)
+                        df_final = pd.concat([v_d1.reset_index(drop=True), v_d2.reset_index(drop=True)], axis=1)
+                        
+                        # Guardamos cada socio/proveedor en su propia pestaña
+                        # (Limpiamos el nombre para que Excel no de error con pestañas largas)
+                        sheet_name = str(nombre)[:31].replace('[','').replace(']','')
+                        df_final.to_excel(writer, sheet_name=sheet_name, index=False)
+                return output.getvalue()
+
+            # --- BOTONES DE DESCARGA ---
+            col_a, col_b = st.columns(2)
+            
+            with col_a:
+                excel_mzb = generar_excel_compacto(mzb_listado, "Socio")
+                st.download_button(
+                    label="📥 EXCEL PARA SOCIOS",
+                    data=excel_mzb,
+                    file_name="PLANING_SOCIOS_COMPACTO.xlsx",
+                    mime="application/vnd.ms-excel",
+                    use_container_width=True
+                )
+            
+            with col_b:
+                excel_prov = generar_excel_compacto(prov_listado, "Proveedor")
+                st.download_button(
+                    label="📥 EXCEL PARA PROVEEDORES",
+                    data=excel_prov,
+                    file_name="PLANING_PROVEEDORES_COMPACTO.xlsx",
+                    mime="application/vnd.ms-excel",
+                    use_container_width=True
+                )
 
 # --- CABECERA ---
 c1, c2, c3 = st.columns([1, 4, 1])
@@ -262,6 +291,7 @@ else: # MZB o Proveedor
     buf = io.BytesIO()
     with pd.ExcelWriter(buf, engine='xlsxwriter') as wr: res.to_excel(wr, index=False)
     st.download_button("📥 DESCARGAR EXCEL", buf.getvalue(), f"{sel}.xlsx")
+
 
 
 

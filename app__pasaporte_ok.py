@@ -12,36 +12,48 @@ st.set_page_config(
     page_icon="logo_mzb.jpg" if os.path.exists("logo_mzb.jpg") else "💧"
 )
 
-# --- CSS ESTILO ULTRA TOP (NEGRO Y NARANJA) ---
+# --- CSS MEJORADO: CONTRASTE ALTO PARA TABLAS ---
 st.markdown("""
     <style>
     .main { background-color: #000000; }
-    body { background-color: #000000; color: white; }
-    .titulo-principal {
-        color: #FF8C00; font-size: 28px !important; font-weight: 900 !important;
-        line-height: 1.1; text-transform: uppercase; text-align: center; margin-bottom: 10px;
+    [data-testid="stAppViewContainer"] { background-color: #000000; }
+    
+    /* Títulos y Cards */
+    .socio-card {
+        background-color: #1a1a1a; padding: 15px; border-radius: 12px;
+        color: #FF8C00; text-align: center; margin-bottom: 15px; 
+        border: 2px solid #FF8C00; box-shadow: 0px 4px 10px rgba(255, 140, 0, 0.2);
     }
+    
+    /* TABLAS: Ahora con fondo para que se lean sobre el negro */
+    [data-testid="stTable"] { 
+        background-color: #1a1a1a !important; 
+        border-radius: 10px;
+        overflow: hidden;
+    }
+    table { color: white !important; width: 100% !important; border-collapse: collapse; }
+    th { background-color: #FF8C00 !important; color: black !important; font-weight: bold; padding: 10px; }
+    td { border-bottom: 1px solid #333 !important; padding: 10px; text-align: left; }
+    
+    /* Sidebar y botones */
+    [data-testid="stSidebar"] { background-color: #111111; border-right: 1px solid #FF8C00; }
+    .stDownloadButton button, .stLinkButton a {
+        background-color: #FF8C00 !important; color: black !important;
+        font-weight: bold !important; width: 100% !important; border-radius: 10px;
+        padding: 12px; border: none; text-decoration: none; display: block;
+    }
+    
     .status-box {
         background: linear-gradient(90deg, #FF8C00, #FF4500);
         color: black; padding: 15px; border-radius: 12px;
         text-align: center; font-weight: bold; font-size: 18px; margin-bottom: 20px;
     }
-    .socio-card {
-        background-color: #111; padding: 12px; border-radius: 10px;
-        color: #FF8C00; text-align: center; margin-bottom: 10px; border: 2px solid #FF8C00;
-    }
+    
     .asamblea-card {
-        background-color: #111; padding: 15px; border-radius: 10px; 
-        border-left: 4px solid #FF8C00; color: white; margin-bottom: 10px;
+        background-color: #1a1a1a; padding: 20px; border-radius: 10px; 
+        border-left: 5px solid #FF8C00; color: white; margin-bottom: 15px;
     }
-    .stDownloadButton button, .stLinkButton a {
-        background-color: #FF8C00 !important; color: black !important;
-        font-weight: bold !important; width: 100% !important; border-radius: 10px;
-        text-decoration: none; display: inline-block; text-align: center; padding: 12px 0;
-        border: none;
-    }
-    [data-testid="stTable"] { width: 100% !important; color: white !important; background-color: #111; }
-    th { background-color: #FF8C00 !important; color: black !important; }
+    
     .alergia-box {
         background-color: #330000; color: #FF4B4B; padding: 15px; 
         border-radius: 10px; border: 1px solid #FF4B4B; text-align: center;
@@ -49,28 +61,19 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-# --- MENSAJE DE BIENVENIDA ---
+# --- DIÁLOGO DE BIENVENIDA ---
 @st.dialog("💧 BIENVENIDO A EXPOOL 2026")
 def bienvenida():
-    st.markdown("""
-    <div style="text-align: center;">
-        <p style="font-size: 18px;"><b>¡Tu Pasaporte MZB ya está listo!</b></p>
-        <p>Para llevar la agenda siempre a mano en tu móvil:</p>
-    </div>
-    """, unsafe_allow_html=True)
-    st.markdown("""
-    1. Pulsa los **3 puntos** (Android) o el botón **Compartir** (iPhone).
-    2. Selecciona la opción **'Añadir a pantalla de inicio'**.
-    3. ¡Listo! Tendrás el icono de la App junto a tus otras aplicaciones.
-    """)
-    if st.button("CONFIGURAR MÁS TARDE", use_container_width=True):
+    st.markdown('<div style="text-align: center;"><b>¡Tu Pasaporte MZB ya está listo!</b><br>Sigue estos pasos para instalarlo:</div>', unsafe_allow_html=True)
+    st.markdown("1. Pulsa **Compartir** o los **3 puntos**.\n2. Elige **'Añadir a pantalla de inicio'**.")
+    if st.button("ENTRAR A LA APP"):
         st.session_state.visto = True
         st.rerun()
 
 if 'visto' not in st.session_state:
     bienvenida()
 
-# --- LISTADOS OFICIALES ---
+# --- LISTADOS ---
 mzb_listado = [
     "AIGUANET GARDEN AND POOL", "AISLANTES AISLAMAX", "AIT", "AZ PISCINAS", "CIPAGUA",
     "OCIO JARDIN CARRETERO S.L.", "AQUAINDESA", "CALDARIUM", "CONSAN PISCINAS", "COSTA PISCINAS",
@@ -124,26 +127,6 @@ def generar_datos_feria(dia):
         filas.append({"HORA": "17:00", "TIPO": "EVENTO", **{s: "🎰 SORTEO PROVEEDORES" for s in mzb_listado}})
     return pd.DataFrame(filas)
 
-# --- TIEMPO REAL ---
-tz = pytz.timezone('Europe/Madrid')
-ahora = datetime.now(tz)
-hora_str = ahora.strftime("%H:%M")
-hoy_str = ahora.strftime("%d/%m")
-
-def obtener_estado_actual(nombre, es_mzb):
-    if hoy_str == "03/03": df_hoy = generar_datos_feria("Día 1 (3 Marzo)")
-    elif hoy_str == "04/03": df_hoy = generar_datos_feria("Día 2 (4 Marzo)")
-    else: return "⏳ PRÓXIMAMENTE: EXPOOL 2026 (3-4 MARZO)"
-    
-    for i in range(len(df_hoy)-1):
-        if df_hoy.iloc[i]["HORA"] <= hora_str < df_hoy.iloc[i+1]["HORA"]:
-            if df_hoy.iloc[i]["TIPO"] == "EVENTO": return f"📍 EVENTO: {df_hoy.iloc[i][mzb_listado[0]]}"
-            if es_mzb: return f"📍 AHORA EN STAND: {df_hoy.iloc[i][nombre]}"
-            else:
-                visita = next((s for s in mzb_listado if df_hoy.iloc[i][s] == nombre), "☕ LIBRE")
-                return f"📍 RECIBIENDO A: {visita}"
-    return "😴 FERIA CERRADA POR HOY"
-
 # --- SIDEBAR ---
 with st.sidebar:
     if os.path.exists("logo_mzb.jpg"): st.image("logo_mzb.jpg", use_container_width=True)
@@ -154,28 +137,28 @@ with st.sidebar:
         if vista != "AGENDA GENERAL":
             sel = st.selectbox("👤 SELECCIONA NOMBRE:", mzb_listado if vista == "MZB" else prov_listado)
 
-    # --- ZONA ADMIN ---
-    with st.expander("🔐 ACCESO ORGANIZACIÓN"):
-        pwd_admin = st.text_input("Clave Admin:", type="password")
-        if pwd_admin == "cipoteboys":
-            st.success("✅ Acceso Concedido")
-            def excel_proveedores():
-                output = io.BytesIO()
+    # ADMIN
+    with st.expander("🔐 ADMIN"):
+        pwd = st.text_input("Clave:", type="password")
+        if pwd == "cipoteboys":
+            st.success("Acceso OK")
+            def get_xlsx():
+                out = io.BytesIO()
                 d1, d2 = generar_datos_feria("Día 1 (3 Marzo)"), generar_datos_feria("Día 2 (4 Marzo)")
-                with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
+                with pd.ExcelWriter(out, engine='xlsxwriter') as wr:
                     for p in prov_listado:
                         ag = []
                         for h in d1["HORA"].unique():
                             s1 = next((s for s in mzb_listado if d1.loc[d1["HORA"]==h, s].iloc[0] == p), "-")
                             s2 = next((s for s in mzb_listado if d2.loc[d2["HORA"]==h, s].iloc[0] == p), "-")
                             ag.append({'HORA': h, 'DÍA 1': s1, 'HORA ': h, 'DÍA 2': s2})
-                        pd.DataFrame(ag).to_excel(writer, sheet_name=str(p)[:30].strip().replace('/','-'), index=False)
-                return output.getvalue()
-            st.download_button("📥 EXCEL PROVEEDORES", excel_proveedores(), "PLANING_PROV.xlsx", use_container_width=True)
+                        pd.DataFrame(ag).to_excel(wr, sheet_name=str(p)[:30].strip().replace('/','-'), index=False)
+                return out.getvalue()
+            st.download_button("📥 EXCEL PROVEEDORES", get_xlsx(), "PLANING_PROV.xlsx")
 
 # --- VISTAS ---
 if vista == "AGENDA GENERAL":
-    st.markdown('<div class="socio-card"><h2>📅 CUADRANTE GENERAL</h2></div>', unsafe_allow_html=True)
+    st.markdown('<div class="socio-card"><h2>📅 AGENDA GENERAL</h2></div>', unsafe_allow_html=True)
     df = generar_datos_feria(dia_sel)
     for _, r in df.iterrows():
         with st.expander(f"⏰ {r['HORA']}"):
@@ -184,14 +167,12 @@ if vista == "AGENDA GENERAL":
                 for m in mzb_listado: st.write(f"🔹 {m} ➔ {r[m]}")
 
 elif vista == "MZB":
-    estado = obtener_estado_actual(sel, True)
-    st.markdown(f'<div class="status-box">{estado}</div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="socio-card"><h2>👤 {sel}</h2></div>', unsafe_allow_html=True)
     df = generar_datos_feria(dia_sel)
     st.table(df[["HORA", sel]].rename(columns={sel: "VISITA A:"}))
 
 elif vista == "Proveedor / Stand":
-    estado = obtener_estado_actual(sel, False)
-    st.markdown(f'<div class="status-box">{estado}</div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="socio-card"><h2>🏗️ STAND: {sel}</h2></div>', unsafe_allow_html=True)
     df = generar_datos_feria(dia_sel)
     v = []
     for _, r in df.iterrows():
@@ -201,34 +182,16 @@ elif vista == "Proveedor / Stand":
 
 elif vista == "🏛️ ASAMBLEA":
     st.markdown('<div class="socio-card"><h1>🏛️ ASAMBLEA GENERAL</h1></div>', unsafe_allow_html=True)
-    password = st.text_input("Introduce la clave de Socio:", type="password")
-    if password == "ZB2026":
-        st.success("✅ Acceso concedido")
+    pw_asamblea = st.text_input("Clave Socio:", type="password")
+    if pw_asamblea == "ZB2026":
         st.markdown('<div class="asamblea-card">📍 UBICACIÓN: Edificio Multiusos de Amposta</div>', unsafe_allow_html=True)
         c1, c2 = st.columns(2)
         with c1:
-            st.markdown("""<div class="asamblea-card">
-                <h3 style="color: #FF8C00;">📅 SESIÓN 1</h3>
-                <p><b>Lunes 2 de Marzo</b></p>
-                <ul style="font-size: 14px;">
-                    <li>1. Bienvenida Presidente y Consejo.</li>
-                    <li>2. ALTAS y BAJAS Grupo ZB 2026.</li>
-                    <li>3. Actividades FERIA EXPOOL 2026.</li>
-                    <li>4. COMPRAS a PROVEEDORES 2025.</li>
-                    <li>5. PROVEEDORES 2026 y ZB AQUANATUR.</li>
-                </ul></div>""", unsafe_allow_html=True)
+            st.markdown("""<div class="asamblea-card"><h3 style="color: #FF8C00;">📅 SESIÓN 1</h3><p><b>Lunes 2 de Marzo</b></p>
+                <ul style="font-size: 15px;"><li>1. Bienvenida Presidente.</li><li>2. ALTAS/BAJAS 2026.</li><li>3. Actividades FERIA.</li><li>4. COMPRAS 2025.</li><li>5. PROVEEDORES 2026.</li></ul></div>""", unsafe_allow_html=True)
         with c2:
-            st.markdown("""<div class="asamblea-card">
-                <h3 style="color: #FF8C00;">📅 SESIÓN 2</h3>
-                <p><b>Jueves 5 de Marzo</b></p>
-                <ul style="font-size: 14px;">
-                    <li>6. FIGURA SOCIO Y RAPPEL 2025.</li>
-                    <li>7. PROGRAMA ZB PLATINUM 2026.</li>
-                    <li>8. MARKETING, WEB y RR.SS.</li>
-                    <li>9. NUEVO CATÁLOGO ZB 2026-27.</li>
-                    <li>10. Ruegos y Preguntas.</li>
-                </ul></div>""", unsafe_allow_html=True)
-    elif password != "": st.error("❌ Clave incorrecta.")
+            st.markdown("""<div class="asamblea-card"><h3 style="color: #FF8C00;">📅 SESIÓN 2</h3><p><b>Jueves 5 de Marzo</b></p>
+                <ul style="font-size: 15px;"><li>6. FIGURA SOCIO Y RAPPEL.</li><li>7. ZB PLATINUM 2026.</li><li>8. MARKETING Y WEB.</li><li>9. NUEVO CATÁLOGO.</li><li>10. Ruegos y Preguntas.</li></ul></div>""", unsafe_allow_html=True)
 
 elif vista == "🗺️ PLANO FERIA":
     if os.path.exists("plano.jpg"): st.image("plano.jpg", use_container_width=True)

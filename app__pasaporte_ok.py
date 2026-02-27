@@ -170,7 +170,7 @@ elif vista == "🎉 MENÚS Y OCIO":
     
     # He añadido estilo directamente en el div para forzar el tamaño
     st.markdown("""
-        <div class="alergia-box" style="font-size: 26px !important; font-weight: 900; line-height: 1.2; padding: 25px;">
+        <div class="alergia-box" style="font-size: 40px !important; font-weight: 900; line-height: 1.2; padding: 25px;">
             ⚠️ AVISA DE ALERGIAS A CLAUDIA
         </div>
         """, unsafe_allow_html=True)
@@ -244,6 +244,7 @@ else: # MZB o Proveedor
     buf = io.BytesIO()
     with pd.ExcelWriter(buf, engine='xlsxwriter') as wr: res.to_excel(wr, index=False)
     st.download_button("📥 DESCARGAR EXCEL", buf.getvalue(), f"{sel}.xlsx")
+
 
 
 

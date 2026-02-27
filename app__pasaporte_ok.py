@@ -110,7 +110,7 @@ with c1: st.image("portada.jpg", use_container_width=True)
 with c2: 
     st.markdown('<p class="titulo-principal">EXPOOL 2026<br>PASAPORTE MZB</p>', unsafe_allow_html=True)
     st.image("juntos.png", use_container_width=True)
-with c3: st.image("planong_mzb.jpg", use_container_width=True)
+with c3: st.image("planing_mzb.jpg", use_container_width=True)
 
 # --- VISTAS ---
 if vista == "🏛️ ASAMBLEA":
@@ -158,5 +158,6 @@ else:
     col1, col2 = st.columns(2)
     with col1: st.table(res.head(m))
     with col2: st.table(res.tail(len(res)-m))
+
 
 

@@ -154,23 +154,18 @@ with st.sidebar:
         st.divider()
     with st.expander("🔐 ACCESO ORGANIZACIÓN"):
         pwd_admin = st.text_input("Clave Admin:", type="password")
-        if pwd_admin == "cipoteboys":
+       if pwd_admin == "cipoteboys":
             st.write("### 📂 Generar Listados Maestros")
-            
-          # --- FUNCIÓN INTERNA CORREGIDA (ANTI-ERRORES) ---
+
             def generar_excel_compacto(lista_nombres, tipo):
                 output = io.BytesIO()
                 df_d1 = generar_datos_feria("Día 1 (3 Marzo)")
                 df_d2 = generar_datos_feria("Día 2 (4 Marzo)")
                 
                 with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
-                    # En lugar de usar tu lista, usamos solo los nombres que están en el DataFrame
-                    # Saltamos la columna 'HORA'
                     nombres_reales = [c for c in df_d1.columns if c != 'HORA']
                     
-                    # Si estamos filtrando por tipo, buscamos coincidencias
                     for nombre in nombres_reales:
-                        # Verificamos que el nombre esté en el tipo correcto (Socio o Proveedor)
                         if (tipo == "Socio" and nombre in mzb_listado) or \
                            (tipo == "Proveedor" and nombre in prov_listado):
                             
@@ -182,11 +177,31 @@ with st.sidebar:
                             
                             df_final = pd.concat([v_d1.reset_index(drop=True), v_d2.reset_index(drop=True)], axis=1)
                             
-                            # Limpiar nombre para la pestaña (max 30 car)
                             sheet_name = str(nombre)[:30].strip().replace(':','').replace('/','').replace('\\','').replace('[','').replace(']','')
                             df_final.to_excel(writer, sheet_name=sheet_name, index=False)
                 
-                return output.getvalue()def generar_excel_compacto(lista_nombres, tipo):
+                return output.getvalue()
+
+            # --- BOTONES ---
+            col_a, col_b = st.columns(2)
+            with col_a:
+                st.download_button(
+                    label="📥 EXCEL SOCIOS",
+                    data=generar_excel_compacto(mzb_listado, "Socio"),
+                    file_name="PLANING_SOCIOS_COMPACTO.xlsx",
+                    mime="application/vnd.ms-excel",
+                    use_container_width=True
+                )
+            with col_b:
+                st.download_button(
+                    label="📥 EXCEL PROVEEDORES",
+                    data=generar_excel_compacto(prov_listado, "Proveedor"),
+                    file_name="PLANING_PROVEEDORES_COMPACTO.xlsx",
+                    mime="application/vnd.ms-excel",
+                    use_container_width=True
+                )
+                
+                def generar_excel_compacto(lista_nombres, tipo):
                 output = io.BytesIO()
                 df_d1 = generar_datos_feria("Día 1 (3 Marzo)")
                 df_d2 = generar_datos_feria("Día 2 (4 Marzo)")
@@ -351,6 +366,7 @@ else: # MZB o Proveedor
     buf = io.BytesIO()
     with pd.ExcelWriter(buf, engine='xlsxwriter') as wr: res.to_excel(wr, index=False)
     st.download_button("📥 DESCARGAR EXCEL", buf.getvalue(), f"{sel}.xlsx")
+
 
 
 

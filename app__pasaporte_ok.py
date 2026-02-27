@@ -48,19 +48,25 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-# --- MENSAJE DE BIENVENIDA (MODAL) ---
-@st.dialog("🤝 ¡JUNTOS SOMOS MAS FUERTES! - EXPOOL 2026")
+# --- MENSAJE DE BIENVENIDA DEFINITIVO (SIN LA PALABRA INSTALAR) ---
+@st.dialog("💧 BIENVENIDO A EXPOOL 2026")
 def bienvenida():
-    st.write("¡Bienvenido al punto de encuentro! Añade esta App a tu móvil:")
-    # ... resto del código ...
     st.markdown("""
-    * **iPhone:** Pulsa el botón compartir (cuadrado con flecha) y elige **'Añadir a pantalla de inicio'**.
-    * **Android:** Pulsa los 3 puntos y elige **'Instalar aplicación'**.
+    <div style="text-align: center;">
+        <p style="font-size: 18px;"><b>¡Tu Pasaporte MZB ya está listo!</b></p>
+        <p>Para llevar la agenda siempre a mano en tu móvil:</p>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    st.markdown("""
+    1. Pulsa los **3 puntos** (Android) o el botón **Compartir** (iPhone).
+    2. Selecciona la opción **'Añadir a pantalla de inicio'**.
+    3. ¡Listo! Tendrás el icono de la App junto a tus otras aplicaciones.
     """)
-    if st.button("¡Entendido!"):
+    
+    if st.button("CONFIGURAR MÁS TARDE", use_container_width=True):
         st.session_state.visto = True
         st.rerun()
-
 if 'visto' not in st.session_state:
     bienvenida()
 
@@ -236,6 +242,7 @@ else: # MZB o Proveedor
     buf = io.BytesIO()
     with pd.ExcelWriter(buf, engine='xlsxwriter') as wr: res.to_excel(wr, index=False)
     st.download_button("📥 DESCARGAR EXCEL", buf.getvalue(), f"{sel}.xlsx")
+
 
 
 

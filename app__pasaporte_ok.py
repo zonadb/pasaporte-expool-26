@@ -70,7 +70,7 @@ mzb_listado = [
     "OCIO JARDIN CARRETERO S.L.", "AQUAINDESA", "CALDARIUM", "CONSAN PISCINAS", "COSTA PISCINAS",
     "GRIFONSUR", "GUADALOPE PISCINAS", "HERMONT", "HIDRAULICA AGUA CLARA", "IPOOL CENTER",
     "JUBERT & VILA", "KAU PISCINAS", "MANEIG PISCINES", "NAVARRO A.T.H", "ALELLA PISCINAS",
-    "NEW CHEM", "NEO SWIMMING", "AQUASERVEIS REUS", "PISCIBLUE", "PISCINAS DE LA FLOR",
+    "NEW CHEM", "AQUASERVEIS", "AQUASERVEIS REUS", "PISCIBLUE", "PISCINAS DE LA FLOR",
     "PISCINAS JESUS", "INSTALACIONES PISCINAS JESUS", "PISCINAS LOS BALCONES S.L.U.", "PISCINAS PILIO",
     "PISCINES CENTER", "PISCINES GELMI", "PISCINES PIERA", "PISCISALUD", "POOLMARK",
     "SHOP LINER POOL", "SILLERO E HIJOS SL", "TECNODRY"
@@ -154,7 +154,7 @@ with c2:
     st.markdown('<p class="titulo-principal">EXPOOL 2026<br>PASAPORTE MZB</p>', unsafe_allow_html=True)
     if os.path.exists("juntos.png"): st.image("juntos.png", use_container_width=True)
 with c3: 
-    if os.path.exists("portada.jpg"): st.image("portada.jpg", use_container_width=True)
+    if os.path.exists("planing_mzb.jpg"): st.image("planing_mzb.jpg", use_container_width=True)
 
 # --- VISTAS ---
 if vista == "🆘 AYUDA ZB":
@@ -236,6 +236,7 @@ else: # MZB o Proveedor
     buf = io.BytesIO()
     with pd.ExcelWriter(buf, engine='xlsxwriter') as wr: res.to_excel(wr, index=False)
     st.download_button("📥 DESCARGAR EXCEL", buf.getvalue(), f"{sel}.xlsx")
+
 
 
 

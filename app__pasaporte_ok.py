@@ -7,6 +7,16 @@ import pytz
 
 # 1. CONFIGURACIÓN TOP (Logo en la pestaña)
 st.set_page_config(
+# --- FORZAR ICONO PERSONALIZADO (PWA ICON) ---
+# Esto inyecta el código necesario para que Android (Chrome/Samsung) y iOS reconozcan tu logo
+st.markdown(f"""
+    <head>
+        <link rel="icon" href="https://raw.githubusercontent.com/TU_USUARIO/TU_REPO/main/logo_mzb.jpg">
+        <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/TU_USUARIO/TU_REPO/main/logo_mzb.jpg">
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-title" content="EXPOOL 2026">
+    </head>
+    """, unsafe_allow_html=True)  
     page_title="EXPOOL 2026 - Pasaporte MZB", 
     layout="wide", 
     page_icon="logo_mzb.jpg" if os.path.exists("logo_mzb.jpg") else "💧"
@@ -317,6 +327,7 @@ else: # MZB o Proveedor
     buf = io.BytesIO()
     with pd.ExcelWriter(buf, engine='xlsxwriter') as wr: res.to_excel(wr, index=False)
     st.download_button("📥 DESCARGAR EXCEL", buf.getvalue(), f"{sel}.xlsx")
+
 
 
 

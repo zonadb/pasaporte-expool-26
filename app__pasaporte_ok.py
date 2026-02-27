@@ -163,57 +163,29 @@ with st.sidebar:
     with st.expander("🔐 ACCESO ORGANIZACIÓN"):
         pwd_admin = st.text_input("Clave Admin:", type="password")
         if pwd_admin == "cipoteboys":
-            st.write("### 📂 Generar Listados Maestros")
+            st.success("✅ Acceso Concedido")
             
-            def descargar_excel_seguro():
-                output = io.BytesIO()
-                df_d1 = generar_datos_feria("Día 1 (3 Marzo)")
-                df_d2 = generar_datos_feria("Día 2 (4 Marzo)")
-                
-                with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
-                    columnas_disponibles = [c for c in df_d1.columns if c != 'HORA']
-                    for nombre in columnas_disponibles:
-                        try:
-                            if nombre in df_d1.columns and nombre in df_d2.columns:
-                                v_d1 = df_d1[['HORA', nombre]].copy()
-                                v_d1.columns = ['HORA', 'DÍA 1 (3 Mar)']
-                                v_d2 = df_d2[['HORA', nombre]].copy()
-                                v_d2.columns = ['HORA', 'DÍA 2 (4 Mar)']
-                                df_final = pd.concat([v_d1.reset_index(drop=True), v_d2.reset_index(drop=True)], axis=1)
-                                sheet_name = str(nombre)[:30].strip().replace('/','-').replace(':','').replace('*','')
-                                df_final.to_excel(writer, sheet_name=sheet_name, index=False)
-                        except:
-                            continue
-                return output.getvalue()
-
+            # Generamos los dos días tal cual están en la App
+            df1 = generar_datos_feria("Día 1 (3 Marzo)")
+            df2 = generar_datos_feria("Día 2 (4 Marzo)")
+            
+            # Los pegamos: Día 1 a la izquierda, Día 2 a la derecha
+            # Esto crea un cuadrante gigante con todas las visitas de todos
+            df_total = pd.concat([df1.reset_index(drop=True), df2.reset_index(drop=True)], axis=1)
+            
+            # Convertimos a Excel de forma ultra-simple
+            output = io.BytesIO()
+            with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
+                df_total.to_excel(writer, sheet_name='PLANING_EXPOOL', index=False)
+            
             st.download_button(
-                label="📥 DESCARGAR PLANING COMPLETO",
-                data=descargar_excel_seguro(),
-                file_name="PLANING_EXPOOL_2026.xlsx",
+                label="📥 DESCARGAR CUADRANTE COMPLETO",
+                data=output.getvalue(),
+                file_name="CUADRANTE_EXPOOL_2026.xlsx",
                 mime="application/vnd.ms-excel",
                 use_container_width=True,
-                key="btn_descarga_maestra"
+                key="btn_simple_final"
             )
-            # BOTÓN ÚNICO
-            st.download_button(
-                label="📥 DESCARGAR PLANING COMPLETO (Pestañas)",
-                data=descargar_excel_seguro(),
-                file_name="PLANING_EXPOOL_2026.xlsx",
-                mime="application/vnd.ms-excel",
-                use_container_width=True,
-                key="btn_descarga_maestra"
-            )
-
-            # Botón único y seguro
-            st.download_button(
-                label="📥 DESCARGAR EXCEL MZB (1 HOJA POR SOCIO)",
-                data=generar_excel_mzb_separado(),
-                file_name="PLANING_MZB_EXPOOL_2026.xlsx",
-                mime="application/vnd.ms-excel",
-                use_container_width=True,
-                key="btn_mzb_final"
-            )
-            st.success("¡Listo! Este archivo tiene una pestaña para cada MZB con sus dos días en columnas separadas.")
 # --- VISTAS ---
 if vista == "🆘 AYUDA ZB":
     st.markdown('<div class="socio-card"><h2>🆘 AYUDA EXPOOL</h2></div>', unsafe_allow_html=True)
@@ -294,6 +266,7 @@ else: # MZB o Proveedor
     buf = io.BytesIO()
     with pd.ExcelWriter(buf, engine='xlsxwriter') as wr: res.to_excel(wr, index=False)
     st.download_button("📥 DESCARGAR EXCEL", buf.getvalue(), f"{sel}.xlsx")
+
 
 
 

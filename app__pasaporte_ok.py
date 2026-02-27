@@ -11,61 +11,64 @@ st.set_page_config(
     layout="wide", 
     page_icon="logo_mzb.jpg" if os.path.exists("logo_mzb.jpg") else "💧"
 )
-# --- LÓGICA DE CUENTA ATRÁS PARA EL SORTEO ---
+# --- CONTADOR XL CON EFECTO GLOW (ESTILO EXPOOL) ---
 from datetime import datetime
 import pytz
 
-# Definimos la fecha del sorteo: 4 de Marzo de 2026 a las 17:00
+# Configuración del objetivo: 4 de Marzo a las 17:00
 meta_sorteo = datetime(2026, 3, 4, 17, 0, 0, tzinfo=pytz.timezone('Europe/Madrid'))
 ahora_ct = datetime.now(pytz.timezone('Europe/Madrid'))
 diferencia = meta_sorteo - ahora_ct
 
 if diferencia.total_seconds() > 0:
-    # Extraemos días, horas y minutos
     dias = diferencia.days
     horas, rem = divmod(diferencia.seconds, 3600)
     minutos, _ = divmod(rem, 60)
     
-    # Diseño visual naranja y negro (Estilo EXPOOL)
+    # Cambio de color si faltan menos de 2 horas (7200 segundos)
+    es_urgente = diferencia.total_seconds() < 7200
+    color_principal = "#FF0000" if es_urgente else "#FF8C00"
+    sombra_glow = "0px 0px 20px rgba(255, 0, 0, 0.6)" if es_urgente else "0px 0px 15px rgba(255, 140, 0, 0.4)"
+
     st.markdown(f"""
-        <div style="background: #111; border: 2px solid #FF8C00; border-radius: 15px; padding: 20px; text-align: center; margin-bottom: 20px;">
-            <p style="color: #FF8C00; font-size: 14px; margin: 0; text-transform: uppercase; letter-spacing: 2px;">⏳ CUENTA ATRÁS PARA EL GRAN SORTEO</p>
-            <div style="display: flex; justify-content: center; gap: 15px; margin-top: 10px;">
-                <div style="text-align: center;"><span style="color: white; font-size: 28px; font-weight: 900;">{dias}</span><br><small style="color: #888;">Días</small></div>
-                <div style="text-align: center;"><span style="color: white; font-size: 28px; font-weight: 900;">{horas}</span><br><small style="color: #888;">Horas</small></div>
-                <div style="text-align: center;"><span style="color: white; font-size: 28px; font-weight: 900;">{minutos}</span><br><small style="color: #888;">Min</small></div>
+        <div style="
+            background: #0a0a0a; 
+            border: 3px solid {color_principal}; 
+            border-radius: 20px; 
+            padding: 30px; 
+            text-align: center; 
+            margin: 20px 0;
+            box-shadow: {sombra_glow};
+        ">
+            <p style="color: {color_principal}; font-size: 18px; font-weight: 900; letter-spacing: 3px; margin-bottom: 15px;">
+                {'🚨 ¡SORTEO INMINENTE! 🚨' if es_urgente else '⏳ CUENTA ATRÁS PARA EL GRAN SORTEO'}
+            </p>
+            <div style="display: flex; justify-content: center; align-items: center; gap: 25px;">
+                <div style="text-align: center;">
+                    <div style="color: white; font-size: 55px; font-weight: 900; line-height: 1;">{dias}</div>
+                    <div style="color: {color_principal}; font-size: 12px; font-weight: bold; text-transform: uppercase;">Días</div>
+                </div>
+                <div style="color: #444; font-size: 40px; font-weight: 100;">|</div>
+                <div style="text-align: center;">
+                    <div style="color: white; font-size: 55px; font-weight: 900; line-height: 1;">{horas:02d}</div>
+                    <div style="color: {color_principal}; font-size: 12px; font-weight: bold; text-transform: uppercase;">Hrs</div>
+                </div>
+                <div style="color: #444; font-size: 40px; font-weight: 100;">|</div>
+                <div style="text-align: center;">
+                    <div style="color: white; font-size: 55px; font-weight: 900; line-height: 1;">{minutos:02d}</div>
+                    <div style="color: {color_principal}; font-size: 12px; font-weight: bold; text-transform: uppercase;">Min</div>
+                </div>
             </div>
+            <p style="color: #666; font-size: 14px; margin-top: 15px; font-style: italic;">Miércoles 4 de Marzo - 17:00h</p>
         </div>
     """, unsafe_allow_html=True)
 else:
-    st.markdown('<div class="status-box">🎰 ¡EL SORTEO ESTÁ EN MARCHA! 🎰</div>', unsafe_allow_html=True)# --- LÓGICA DE CUENTA ATRÁS PARA EL SORTEO ---
-from datetime import datetime
-import pytz
-
-# Definimos la fecha del sorteo: 4 de Marzo de 2026 a las 17:00
-meta_sorteo = datetime(2026, 3, 4, 17, 0, 0, tzinfo=pytz.timezone('Europe/Madrid'))
-ahora_ct = datetime.now(pytz.timezone('Europe/Madrid'))
-diferencia = meta_sorteo - ahora_ct
-
-if diferencia.total_seconds() > 0:
-    # Extraemos días, horas y minutos
-    dias = diferencia.days
-    horas, rem = divmod(diferencia.seconds, 3600)
-    minutos, _ = divmod(rem, 60)
-    
-    # Diseño visual naranja y negro (Estilo EXPOOL)
-    st.markdown(f"""
-        <div style="background: #111; border: 2px solid #FF8C00; border-radius: 15px; padding: 20px; text-align: center; margin-bottom: 20px;">
-            <p style="color: #FF8C00; font-size: 14px; margin: 0; text-transform: uppercase; letter-spacing: 2px;">⏳ CUENTA ATRÁS PARA EL GRAN SORTEO</p>
-            <div style="display: flex; justify-content: center; gap: 15px; margin-top: 10px;">
-                <div style="text-align: center;"><span style="color: white; font-size: 28px; font-weight: 900;">{dias}</span><br><small style="color: #888;">Días</small></div>
-                <div style="text-align: center;"><span style="color: white; font-size: 28px; font-weight: 900;">{horas}</span><br><small style="color: #888;">Horas</small></div>
-                <div style="text-align: center;"><span style="color: white; font-size: 28px; font-weight: 900;">{minutos}</span><br><small style="color: #888;">Min</small></div>
-            </div>
+    st.markdown("""
+        <div style="background: linear-gradient(90deg, #FF8C00, #FF4500); padding: 30px; border-radius: 20px; text-align: center; color: black;">
+            <h1 style="margin:0; font-size: 40px;">🎰 ¡SORTEO EN CURSO! 🎰</h1>
+            <p style="font-weight: bold; font-size: 20px;">¡Mucha suerte a todos los socios!</p>
         </div>
     """, unsafe_allow_html=True)
-else:
-    st.markdown('<div class="status-box">🎰 ¡EL SORTEO ESTÁ EN MARCHA! 🎰</div>', unsafe_allow_html=True)
 # --- CSS ESTILO ULTRA TOP ---
 st.markdown("""
     <style>
@@ -298,6 +301,7 @@ else: # MZB o Proveedor
     buf = io.BytesIO()
     with pd.ExcelWriter(buf, engine='xlsxwriter') as wr: res.to_excel(wr, index=False)
     st.download_button("📥 DESCARGAR EXCEL", buf.getvalue(), f"{sel}.xlsx")
+
 
 
 

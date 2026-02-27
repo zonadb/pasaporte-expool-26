@@ -6,7 +6,8 @@ import os
 import pytz
 
 # 1. CONFIGURACIÓN TOP (Logo en la pestaña)
-st.set_page_config(
+st.set_page_config)
+    
 # --- TÍTULO CON EFECTO NEÓN / BACKLIGHT (ESTILO UNIVERSAL) ---
 st.markdown("""
     <style>

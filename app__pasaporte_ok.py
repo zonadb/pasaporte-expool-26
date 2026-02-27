@@ -3,7 +3,6 @@ import pandas as pd
 from datetime import datetime, timedelta
 import io
 import os
-import time
 
 # Configuración con Icono de Gota
 st.set_page_config(page_title="EXPOOL 2026 - Pasaporte MZB", layout="wide", page_icon="💧")
@@ -27,13 +26,16 @@ st.markdown("""
         background-color: #111; padding: 12px; border-radius: 10px;
         color: #FF8C00; text-align: center; margin-bottom: 10px; border: 1px solid #FF8C00;
     }
+    .asamblea-card {
+        background-color: #111; padding: 15px; border-radius: 10px; 
+        border-left: 4px solid #FF8C00; color: white; margin-bottom: 10px;
+    }
     .stDownloadButton button, .stLinkButton a {
         background-color: #FF8C00 !important; color: black !important;
         font-weight: bold !important; width: 100% !important; border-radius: 10px;
         text-decoration: none; display: inline-block; text-align: center; padding: 12px 0;
-        border: none; transition: 0.3s;
+        border: none;
     }
-    .stDownloadButton button:hover { transform: scale(1.02); background-color: #FFA500 !important; }
     [data-testid="stTable"] { width: 100% !important; color: white !important; }
     th { background-color: #FF8C00 !important; color: black !important; }
     .alergia-box {
@@ -49,7 +51,7 @@ mzb_listado = [
     "OCIO JARDIN CARRETERO S.L.", "AQUAINDESA", "CALDARIUM", "CONSAN PISCINAS", "COSTA PISCINAS",
     "GRIFONSUR", "GUADALOPE PISCINAS", "HERMONT", "HIDRAULICA AGUA CLARA", "IPOOL CENTER",
     "JUBERT & VILA", "KAU PISCINAS", "MANEIG PISCINES", "NAVARRO A.T.H", "ALELLA PISCINAS",
-    "NEW CHEM", "AQUA SERVEIS REUS", "AQUASERVEIS GROUP", "PISCIBLUE", "PISCINAS DE LA FLOR",
+    "NEW CHEM", "NEO SWIMMING", "AQUASERVEIS REUS", "PISCIBLUE", "PISCINAS DE LA FLOR",
     "PISCINAS JESUS", "INSTALACIONES PISCINAS JESUS", "PISCINAS LOS BALCONES S.L.U.", "PISCINAS PILIO",
     "PISCINES CENTER", "PISCINES GELMI", "PISCINES PIERA", "PISCISALUD", "POOLMARK",
     "SHOP LINER POOL", "SILLERO E HIJOS SL", "TECNODRY"
@@ -110,14 +112,13 @@ with c1: st.image("portada.jpg", use_container_width=True)
 with c2: 
     st.markdown('<p class="titulo-principal">EXPOOL 2026<br>PASAPORTE MZB</p>', unsafe_allow_html=True)
     st.image("juntos.png", use_container_width=True)
-with c3: st.image("planing_mzb.jpg", use_container_width=True)
+with c3: st.image("portada.jpg", use_container_width=True)
 
 # --- LÓGICA DE TIEMPO REAL ---
 ahora = datetime.now()
 hora_str = ahora.strftime("%H:%M")
 
 def obtener_estado_actual(df, nombre, es_mzb):
-    # Forzamos una hora para pruebas si quieres: hora_test = "10:30"
     for i in range(len(df)-1):
         h_actual = df.iloc[i]["Hora"]
         h_siguiente = df.iloc[i+1]["Hora"]
@@ -142,13 +143,15 @@ elif vista == "🎉 MENÚS Y OCIO":
     st.markdown('<div class="alergia-box">⚠️ Avisa de alergias a Claudia.</div>', unsafe_allow_html=True)
     st.link_button("📲 AVISAR ALERGIAS", "https://wa.me/34670379925?text=Tengo%20una%20alergia...")
 
+elif vista == "🏛️ ASAMBLEA":
+    st.markdown('<div class="socio-card"><h3>Lunes 2 - 16:00h | Jueves 5 - 10:00h</h3></div>', unsafe_allow_html=True)
+    st.markdown("📍 Ubicación: Edificio Multiusos Amposta")
+
 elif vista == "AGENDA GENERAL":
-    # Cuenta atrás para el sorteo (4 Marzo 17:00)
     meta = datetime(2026, 3, 4, 17, 0)
     faltan = meta - ahora
     if faltan.total_seconds() > 0:
         st.markdown(f'<div class="status-box">🎰 SORTEO EN: {str(faltan).split(".")[0]}</div>', unsafe_allow_html=True)
-    
     df = generar_datos_feria(dia_sel)
     for _, fila in df.iterrows():
         with st.expander(f"⏰ {fila['Hora']}"):
@@ -161,19 +164,20 @@ else: # MZB o Proveedor
     estado = obtener_estado_actual(df, sel, vista == "MZB")
     st.markdown(f'<div class="status-box">{estado}</div>', unsafe_allow_html=True)
     
-    if vista == "MZB": res = df[["Hora", sel]].rename(columns={sel: "VISITA A:"})
+    if vista == "MZB":
+        res = df[["Hora", sel]].rename(columns={sel: "VISITA A:"})
     else:
         v = []
         for _, r in df.iterrows():
-            if r["TIPO"] == "EVENTO": v.append({"Hora": r["Hora"], "ESTADO": r[mzb_listado[0]]})
-            else: v.append({"Hora": r["Hora"], "ESTADO": next((s for s in mzb_listado if r[s] == sel), "☕ LIBRE")})
+            if r["TIPO"] == "EVENTO":
+                v.append({"Hora": r["Hora"], "ESTADO": r[mzb_listado[0]]})
+            else:
+                visitante = next((s for s in mzb_listado if r[s] == sel), "☕ LIBRE")
+                v.append({"Hora": r["Hora"], "ESTADO": visitante})
         res = pd.DataFrame(v)
     
     st.table(res)
     buf = io.BytesIO()
-    with pd.ExcelWriter(buf) as wr: res.to_excel(wr, index=False)
+    with pd.ExcelWriter(buf, engine='xlsxwriter') as wr:
+        res.to_excel(wr, index=False)
     st.download_button("📥 DESCARGAR AGENDA EXCEL", buf.getvalue(), f"{sel}.xlsx")
-
-elif vista == "🏛️ ASAMBLEA":
-    st.markdown('<div class="socio-card"><h3>Lunes 2 - 16:00h | Jueves 5 - 10:00h</h3></div>', unsafe_allow_html=True)
-

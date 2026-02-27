@@ -126,7 +126,7 @@ with c1: st.image("portada.jpg", use_container_width=True)
 with c2: 
     st.markdown('<p class="titulo-principal">EXPOOL 2026<br>PASAPORTE MZB</p>', unsafe_allow_html=True)
     st.image("juntos.png", use_container_width=True)
-with c3: st.image("portada.jpg", use_container_width=True)
+with c3: st.image("planing_mzb.jpg", use_container_width=True)
 
 # --- VISTAS ---
 if vista == "🆘 AYUDA ZB":
@@ -186,4 +186,5 @@ else: # MZB o Proveedor
     buf = io.BytesIO()
     with pd.ExcelWriter(buf, engine='xlsxwriter') as wr: res.to_excel(wr, index=False)
     st.download_button("📥 DESCARGAR EXCEL", buf.getvalue(), f"{sel}.xlsx")
+
 

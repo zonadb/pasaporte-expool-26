@@ -157,7 +157,7 @@ with st.sidebar:
         if pwd_admin == "cipoteboys":
             st.write("### 📂 Generar Listados Maestros")
             
-            # --- FUNCIÓN INTERNA PARA CREAR EL FORMATO COMPACTO ---
+          # --- FUNCIÓN INTERNA CORREGIDA (ANTI-ERRORES) ---
             def generar_excel_compacto(lista_nombres, tipo):
                 output = io.BytesIO()
                 df_d1 = generar_datos_feria("Día 1 (3 Marzo)")
@@ -165,17 +165,42 @@ with st.sidebar:
                 
                 with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
                     for nombre in lista_nombres:
-                        # Extraemos las visitas de cada día
-                        v_d1 = df_d1[['HORA', nombre]].rename(columns={nombre: 'DÍA 1 (3 Marzo)'})
-                        v_d2 = df_d2[['HORA', nombre]].rename(columns={nombre: 'DÍA 2 (4 Marzo)'})
-                        
-                        # Unimos en dos columnas (una al lado de la otra)
-                        df_final = pd.concat([v_d1.reset_index(drop=True), v_d2.reset_index(drop=True)], axis=1)
-                        
-                        # Guardamos cada socio/proveedor en su propia pestaña
-                        # (Limpiamos el nombre para que Excel no de error con pestañas largas)
-                        sheet_name = str(nombre)[:31].replace('[','').replace(']','')
-                        df_final.to_excel(writer, sheet_name=sheet_name, index=False)
+                        # Verificamos si el nombre existe en AMBOS días para evitar el KeyError
+                        if nombre in df_d1.columns and nombre in df_d2.columns:
+                            v_d1 = df_d1[['HORA', nombre]].rename(columns={nombre: 'DÍA 1 (3 Marzo)'})
+                            v_d2 = df_d2[['HORA', nombre]].rename(columns={nombre: 'DÍA 2 (4 Marzo)'})
+                            
+                            df_final = pd.concat([v_d1.reset_index(drop=True), v_d2.reset_index(drop=True)], axis=1)
+                            
+                            # Limpiar nombre para la pestaña de Excel (máx 31 caracteres y sin símbolos raros)
+                            sheet_name = str(nombre)[:30].replace('[','').replace(']','').replace(':','').replace('*','').replace('?','').replace('/','').replace('\\','')
+                            df_final.to_excel(writer, sheet_name=sheet_name, index=False)
+                        else:
+                            # Si un nombre falla, nos avisa en la consola pero no rompe la App
+                            print(f"Aviso: El nombre {nombre} no se encontró en las columnas.")
+                            
+                return output.getvalue()# --- FUNCIÓN INTERNA CORREGIDA (ANTI-ERRORES) ---
+            def generar_excel_compacto(lista_nombres, tipo):
+                output = io.BytesIO()
+                df_d1 = generar_datos_feria("Día 1 (3 Marzo)")
+                df_d2 = generar_datos_feria("Día 2 (4 Marzo)")
+                
+                with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
+                    for nombre in lista_nombres:
+                        # Verificamos si el nombre existe en AMBOS días para evitar el KeyError
+                        if nombre in df_d1.columns and nombre in df_d2.columns:
+                            v_d1 = df_d1[['HORA', nombre]].rename(columns={nombre: 'DÍA 1 (3 Marzo)'})
+                            v_d2 = df_d2[['HORA', nombre]].rename(columns={nombre: 'DÍA 2 (4 Marzo)'})
+                            
+                            df_final = pd.concat([v_d1.reset_index(drop=True), v_d2.reset_index(drop=True)], axis=1)
+                            
+                            # Limpiar nombre para la pestaña de Excel (máx 31 caracteres y sin símbolos raros)
+                            sheet_name = str(nombre)[:30].replace('[','').replace(']','').replace(':','').replace('*','').replace('?','').replace('/','').replace('\\','')
+                            df_final.to_excel(writer, sheet_name=sheet_name, index=False)
+                        else:
+                            # Si un nombre falla, nos avisa en la consola pero no rompe la App
+                            print(f"Aviso: El nombre {nombre} no se encontró en las columnas.")
+                            
                 return output.getvalue()
 
             # --- BOTONES DE DESCARGA ---
@@ -291,6 +316,7 @@ else: # MZB o Proveedor
     buf = io.BytesIO()
     with pd.ExcelWriter(buf, engine='xlsxwriter') as wr: res.to_excel(wr, index=False)
     st.download_button("📥 DESCARGAR EXCEL", buf.getvalue(), f"{sel}.xlsx")
+
 
 
 

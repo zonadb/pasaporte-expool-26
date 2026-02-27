@@ -165,59 +165,34 @@ with st.sidebar:
         if pwd_admin == "cipoteboys":
             st.success("✅ Acceso Concedido")
             
-            # --- DATOS BASE (Lo que la App ve realmente) ---
-            df1 = generar_datos_feria("Día 1 (3 Marzo)")
-            df2 = generar_datos_feria("Día 2 (4 Marzo)")
+            # 1. Generamos los datos tal cual los pinta la App en pantalla
+            df_d1_raw = generar_datos_feria("Día 1 (3 Marzo)")
+            df_d2_raw = generar_datos_feria("Día 2 (4 Marzo)")
 
-            # --- LÓGICA DE EXTRACCIÓN AUTOMÁTICA ---
-            # En lugar de usar mzb_listado, miramos qué columnas hay en la tabla real
-            # Esto evita el error de "AQUASERVEIS" vs "Neo Swimming"
-            todas_las_columnas = [c for c in df1.columns if c != 'HORA']
+            # 2. Forzamos a que las columnas sean texto limpio (quitar espacios raros)
+            df_d1_raw.columns = [str(c).strip() for c in df_d1_raw.columns]
+            df_d2_raw.columns = [str(c).strip() for c in df_d2_raw.columns]
+
+            # --- BOTÓN EXCEL COMPLETO (SOCIOS Y PROVEEDORES) ---
+            # Unimos los dos días. Esto crea un Excel con TODOS los nombres
+            df_maestro = pd.concat([df_d1_raw.reset_index(drop=True), 
+                                   df_d2_raw.reset_index(drop=True)], axis=1)
+
+            out_total = io.BytesIO()
+            with pd.ExcelWriter(out_total, engine='xlsxwriter') as writer:
+                df_maestro.to_excel(writer, sheet_name='PLANING_EXPOOL_2026', index=False)
             
-            # Separamos basándonos en si el nombre está en una lista o en otra
-            # pero SOLO si el nombre existe en la tabla df1
-            columnas_socios = [c for c in todas_las_columnas if c in mzb_listado]
-            columnas_prov = [c for c in todas_las_columnas if c in prov_listado]
-
-            # --- GENERADOR DE EXCEL SEGURO ---
-            def crear_excel_seguro(columnas_interes):
-                # Cogemos HORA + los nombres encontrados
-                lista_final = ['HORA'] + columnas_interes
-                # Solo extraemos si las columnas existen de verdad para evitar KeyError
-                d1_sub = df1[[c for c in lista_final if c in df1.columns]].copy().reset_index(drop=True)
-                d2_sub = df2[[c for c in lista_final if c in df2.columns]].copy().reset_index(drop=True)
-                
-                # Pegamos Día 1 y Día 2
-                return pd.concat([d1_sub, d2_sub], axis=1)
-
-            # --- BOTONES ---
-            col_a, col_b = st.columns(2)
+            st.write("📂 **Descarga Directa:**")
+            st.download_button(
+                label="📥 DESCARGAR CUADRANTE MAESTRO (SOCIOS Y STANDS)",
+                data=out_total.getvalue(),
+                file_name="AGENDA_COMPLETA_EXPOOL.xlsx",
+                mime="application/vnd.ms-excel",
+                use_container_width=True,
+                key="btn_maestro_total"
+            )
             
-            with col_a:
-                df_mzb = crear_excel_seguro(columnas_socios)
-                out_mzb = io.BytesIO()
-                with pd.ExcelWriter(out_mzb, engine='xlsxwriter') as writer:
-                    df_mzb.to_excel(writer, sheet_name='SOCIOS', index=False)
-                st.download_button(
-                    label="📥 EXCEL SOCIOS",
-                    data=out_mzb.getvalue(),
-                    file_name="SOCIOS_EXPOOL.xlsx",
-                    use_container_width=True,
-                    key="btn_mzb_final_v3"
-                )
-
-            with col_b:
-                df_prov = crear_excel_seguro(columnas_prov)
-                out_prov = io.BytesIO()
-                with pd.ExcelWriter(out_prov, engine='xlsxwriter') as writer:
-                    df_prov.to_excel(writer, sheet_name='PROVEEDORES', index=False)
-                st.download_button(
-                    label="📥 EXCEL PROVEEDORES",
-                    data=out_prov.getvalue(),
-                    file_name="PROVEEDORES_EXPOOL.xlsx",
-                    use_container_width=True,
-                    key="btn_prov_final_v3"
-                )
+            st.info("💡 Este archivo contiene todas las columnas de la feria. Puedes usar el buscador de Excel (Ctrl+F) para encontrar cualquier Socio o Proveedor rápidamente.")
 # --- VISTAS ---
 if vista == "🆘 AYUDA ZB":
     st.markdown('<div class="socio-card"><h2>🆘 AYUDA EXPOOL</h2></div>', unsafe_allow_html=True)
@@ -298,6 +273,7 @@ else: # MZB o Proveedor
     buf = io.BytesIO()
     with pd.ExcelWriter(buf, engine='xlsxwriter') as wr: res.to_excel(wr, index=False)
     st.download_button("📥 DESCARGAR EXCEL", buf.getvalue(), f"{sel}.xlsx")
+
 
 
 

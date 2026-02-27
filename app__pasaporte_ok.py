@@ -49,17 +49,18 @@ st.markdown("""
     """, unsafe_allow_html=True)
 
 # --- MENSAJE DE BIENVENIDA (MODAL) ---
+# --- MENSAJE DE BIENVENIDA (MODAL CORREGIDO) ---
 @st.dialog("🚀 ¡BIENVENIDO A EXPOOL 2026!")
 def bienvenida():
-    st.write("Para una experiencia **TOP**, instala esta App en tu móvil:")
+    st.write("Para llevar tu agenda siempre a mano, añade esta App a tu móvil:")
     st.markdown("""
-    * **iPhone:** Pulsa el botón compartir (cuadrado con flecha) y elige **'Añadir a pantalla de inicio'**.
-    * **Android:** Pulsa los 3 puntos y elige **'Instalar aplicación'**.
+    1. Pulsa los **3 puntos** (en Android) o el botón **Compartir** (en iPhone).
+    2. Selecciona **'Añadir a pantalla de inicio'**.
+    3. ¡Listo! Ya tendrás el icono de EXPOOL con el resto de tus Apps.
     """)
-    if st.button("¡Entendido!"):
+    if st.button("¡ENTENDIDO!"):
         st.session_state.visto = True
         st.rerun()
-
 if 'visto' not in st.session_state:
     bienvenida()
 
@@ -235,4 +236,5 @@ else: # MZB o Proveedor
     buf = io.BytesIO()
     with pd.ExcelWriter(buf, engine='xlsxwriter') as wr: res.to_excel(wr, index=False)
     st.download_button("📥 DESCARGAR EXCEL", buf.getvalue(), f"{sel}.xlsx")
+
 

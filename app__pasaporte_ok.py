@@ -159,35 +159,49 @@ with st.sidebar:
 
     with st.expander("🔐 ACCESO ORGANIZACIÓN"):
         pwd_admin = st.text_input("Clave Admin:", type="password")
-        if pwd_admin == "cipoteboys":
-            st.write("### 📂 Generar Listado por MZB")
+       if pwd_admin == "cipoteboys":
+            st.write("### 📂 Generar Listados Maestros")
             
-            def generar_excel_mzb_separado():
+            def descargar_excel_seguro():
                 output = io.BytesIO()
+                # Obtenemos los datos brutos de cada día
                 df_d1 = generar_datos_feria("Día 1 (3 Marzo)")
                 df_d2 = generar_datos_feria("Día 2 (4 Marzo)")
                 
-                # Obtenemos la lista real de columnas (excluyendo 'HORA')
-                # Así no importa si cambiaste Neo Swimming por AQUASERVEIS, el código lo lee solo
-                nombres_reales = [c for c in df_d1.columns if c != 'HORA']
-                
                 with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
-                    for nombre in nombres_reales:
-                        # Extraemos el día 1 y día 2 del socio actual
-                        col1 = df_d1[['HORA', nombre]].copy()
-                        col1.columns = ['HORA', 'DÍA 1 (Lunes)']
-                        
-                        col2 = df_d2[['HORA', nombre]].copy()
-                        col2.columns = ['HORA', 'DÍA 2 (Martes)']
-                        
-                        # Los pegamos uno al lado del otro
-                        df_socio = pd.concat([col1.reset_index(drop=True), col2.reset_index(drop=True)], axis=1)
-                        
-                        # Limpiamos el nombre para la pestaña (máx 30 letras)
-                        pestaña = str(nombre)[:30].strip().replace('/','-')
-                        df_socio.to_excel(writer, sheet_name=pestaña, index=False)
+                    # Buscamos qué columnas (nombres) hay realmente en la tabla generada
+                    columnas_disponibles = [c for c in df_d1.columns if c != 'HORA']
+                    
+                    for nombre in columnas_disponibles:
+                        try:
+                            # Creamos el plan de 2 columnas para el socio/proveedor actual
+                            # Solo si el nombre existe en ambos días
+                            if nombre in df_d1.columns and nombre in df_d2.columns:
+                                v_d1 = df_d1[['HORA', nombre]].copy()
+                                v_d1.columns = ['HORA', 'DÍA 1 (3 Mar)']
+                                
+                                v_d2 = df_d2[['HORA', nombre]].copy()
+                                v_d2.columns = ['HORA', 'DÍA 2 (4 Mar)']
+                                
+                                df_final = pd.concat([v_d1.reset_index(drop=True), v_d2.reset_index(drop=True)], axis=1)
+                                
+                                # Limpieza extrema del nombre de la pestaña
+                                sheet_name = str(nombre)[:30].strip().replace('/','-').replace(':','').replace('*','')
+                                df_final.to_excel(writer, sheet_name=sheet_name, index=False)
+                        except:
+                            continue # Si uno falla, saltamos al siguiente sin romper la app
                 
                 return output.getvalue()
+
+            # BOTÓN ÚNICO
+            st.download_button(
+                label="📥 DESCARGAR PLANING COMPLETO (Pestañas)",
+                data=descargar_excel_seguro(),
+                file_name="PLANING_EXPOOL_2026.xlsx",
+                mime="application/vnd.ms-excel",
+                use_container_width=True,
+                key="btn_descarga_maestra"
+            )
 
             # Botón único y seguro
             st.download_button(
@@ -279,6 +293,7 @@ else: # MZB o Proveedor
     buf = io.BytesIO()
     with pd.ExcelWriter(buf, engine='xlsxwriter') as wr: res.to_excel(wr, index=False)
     st.download_button("📥 DESCARGAR EXCEL", buf.getvalue(), f"{sel}.xlsx")
+
 
 
 

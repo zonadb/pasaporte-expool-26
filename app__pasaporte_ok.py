@@ -3,16 +3,12 @@ import pandas as pd
 from datetime import datetime, timedelta
 import io
 import os
-import pytz
+import pytz # Librería para zonas horarias
 
-# 1. CONFIGURACIÓN TOP (Logo en la pestaña)
-st.set_page_config(
-    page_title="EXPOOL 2026 - Pasaporte MZB", 
-    layout="wide", 
-    page_icon="logo_mzb.jpg" if os.path.exists("logo_mzb.jpg") else "💧"
-)
+# Configuración
+st.set_page_config(page_title="EXPOOL 2026 - Pasaporte MZB", layout="wide", page_icon="💧")
 
-# --- CSS ESTILO ULTRA TOP ---
+# --- CSS ESTILO "ULTRA TOP" ---
 st.markdown("""
     <style>
     .main { background-color: #000000; }
@@ -25,14 +21,11 @@ st.markdown("""
         background: linear-gradient(90deg, #FF8C00, #FF4500);
         color: black; padding: 15px; border-radius: 12px;
         text-align: center; font-weight: bold; font-size: 18px; margin-bottom: 20px;
+        box-shadow: 0px 4px 15px rgba(255, 140, 0, 0.3);
     }
     .socio-card {
         background-color: #111; padding: 12px; border-radius: 10px;
         color: #FF8C00; text-align: center; margin-bottom: 10px; border: 1px solid #FF8C00;
-    }
-    .asamblea-card {
-        background-color: #111; padding: 15px; border-radius: 10px; 
-        border-left: 4px solid #FF8C00; color: white; margin-bottom: 10px;
     }
     .stDownloadButton button, .stLinkButton a {
         background-color: #FF8C00 !important; color: black !important;
@@ -41,34 +34,8 @@ st.markdown("""
     }
     [data-testid="stTable"] { width: 100% !important; color: white !important; }
     th { background-color: #FF8C00 !important; color: black !important; }
-    .alergia-box {
-        background-color: #330000; color: #FF4B4B; padding: 15px; 
-        border-radius: 10px; border: 1px solid #FF4B4B; text-align: center;
-    }
     </style>
     """, unsafe_allow_html=True)
-
-# --- MENSAJE DE BIENVENIDA DEFINITIVO (SIN LA PALABRA INSTALAR) ---
-@st.dialog("💧 BIENVENIDO A EXPOOL 2026")
-def bienvenida():
-    st.markdown("""
-    <div style="text-align: center;">
-        <p style="font-size: 18px;"><b>¡Tu Pasaporte MZB ya está listo!</b></p>
-        <p>Para llevar la agenda siempre a mano en tu móvil:</p>
-    </div>
-    """, unsafe_allow_html=True)
-    
-    st.markdown("""
-    1. Pulsa los **3 puntos** (Android) o el botón **Compartir** (iPhone).
-    2. Selecciona la opción **'Añadir a pantalla de inicio'**.
-    3. ¡Listo! Tendrás el icono de la App junto a tus otras aplicaciones.
-    """)
-    
-    if st.button("CONFIGURAR MÁS TARDE", use_container_width=True):
-        st.session_state.visto = True
-        st.rerun()
-if 'visto' not in st.session_state:
-    bienvenida()
 
 # --- LISTADOS ---
 mzb_listado = [
@@ -76,7 +43,7 @@ mzb_listado = [
     "OCIO JARDIN CARRETERO S.L.", "AQUAINDESA", "CALDARIUM", "CONSAN PISCINAS", "COSTA PISCINAS",
     "GRIFONSUR", "GUADALOPE PISCINAS", "HERMONT", "HIDRAULICA AGUA CLARA", "IPOOL CENTER",
     "JUBERT & VILA", "KAU PISCINAS", "MANEIG PISCINES", "NAVARRO A.T.H", "ALELLA PISCINAS",
-    "NEW CHEM", "AQUASERVEIS", "AQUASERVEIS REUS", "PISCIBLUE", "PISCINAS DE LA FLOR",
+    "NEW CHEM", "NEO SWIMMING", "AQUASERVEIS REUS", "PISCIBLUE", "PISCINAS DE LA FLOR",
     "PISCINAS JESUS", "INSTALACIONES PISCINAS JESUS", "PISCINAS LOS BALCONES S.L.U.", "PISCINAS PILIO",
     "PISCINES CENTER", "PISCINES GELMI", "PISCINES PIERA", "PISCISALUD", "POOLMARK",
     "SHOP LINER POOL", "SILLERO E HIJOS SL", "TECNODRY"
@@ -123,7 +90,7 @@ def generar_datos_feria(dia):
         filas.append({"Hora": "17:00", "TIPO": "EVENTO", **{s: "🎰 SORTEO PROVEEDORES" for s in mzb_listado}})
     return pd.DataFrame(filas)
 
-# --- LÓGICA DE TIEMPO REAL (ZONA MADRID) ---
+# --- LÓGICA DE TIEMPO REAL (ZONA HORARIA MADRID) ---
 tz = pytz.timezone('Europe/Madrid')
 ahora = datetime.now(tz)
 hora_str = ahora.strftime("%H:%M")
@@ -133,6 +100,7 @@ def obtener_estado_actual(nombre, es_mzb):
     if hoy_str == "03/03": df_hoy = generar_datos_feria("Día 1 (3 Marzo)")
     elif hoy_str == "04/03": df_hoy = generar_datos_feria("Día 2 (4 Marzo)")
     else: return "⏳ PRÓXIMAMENTE: EXPOOL 2026 (3-4 MARZO)"
+
     for i in range(len(df_hoy)-1):
         h_actual = df_hoy.iloc[i]["Hora"]
         h_siguiente = df_hoy.iloc[i+1]["Hora"]
@@ -146,154 +114,31 @@ def obtener_estado_actual(nombre, es_mzb):
 
 # --- SIDEBAR ---
 with st.sidebar:
-    # 1. El Logo
-    if os.path.exists("logo_mzb.jpg"): 
-        st.image("logo_mzb.jpg", use_container_width=True)
-    
-    # 2. Definimos 'vista' (ESTA LÍNEA ES LA QUE FALTA O ESTÁ MAL PUESTA)
-    vista = st.radio("🔍 MENÚ:", ["AGENDA GENERAL", "MZB", "Proveedor / Stand", "🏛️ ASAMBLEA", "🗺️ PLANO FERIA", "🎉 MENÚS Y OCIO", "🆘 AYUDA ZB"], key="menu_principal")
-    
-    # 3. Selectores condicionales
+    if os.path.exists("logo_mzb.jpg"): st.image("logo_mzb.jpg", use_container_width=True)
+    vista = st.radio("🔍 MENÚ:", ["AGENDA GENERAL", "MZB", "Proveedor / Stand", "🏛️ ASAMBLEA", "🗺️ PLANO FERIA", "🎉 MENÚS Y OCIO", "🆘 AYUDA ZB"])
     if vista not in ["🏛️ ASAMBLEA", "🗺️ PLANO FERIA", "🎉 MENÚS Y OCIO", "🆘 AYUDA ZB"]:
         dia_sel = st.selectbox("📅 JORNADA:", ["Día 1 (3 Marzo)", "Día 2 (4 Marzo)"])
         sel = st.selectbox("👤 SELECCIONA NOMBRE:", mzb_listado if vista == "MZB" else prov_listado)
-        st.divider()
 
-    # 4. Zona de Administración (con el Excel de 2 columnas)
-    with st.expander("🔐 ACCESO ORGANIZACIÓN"):
-        pwd_admin = st.text_input("Clave Admin:", type="password")
-        if pwd_admin == "cipoteboys":
-            st.success("✅ Acceso Concedido")
-            
-            def generar_excel_por_proveedor():
-                output = io.BytesIO()
-                df1 = generar_datos_feria("Día 1 (3 Marzo)")
-                df2 = generar_datos_feria("Día 2 (4 Marzo)")
-                
-                # Lista de socios MZB actualizada
-                socios_mzb = [
-                    "AIGUANET GARDEN AND POOL", "AISLANTES AISLAMAX", "AIT", "AZ PISCINAS", "CIPAGUA",
-                    "OCIO JARDIN CARRETERO S.L.", "AQUAINDESA", "CALDARIUM", "CONSAN PISCINAS", "COSTA PISCINAS",
-                    "GRIFONSUR", "GUADALOPE PISCINAS", "HERMONT", "HIDRAULICA AGUA CLARA", "IPOOL CENTER",
-                    "JUBERT & VILA", "KAU PISCINAS", "MANEIG PISCINES", "NAVARRO A.T.H", "ALELLA PISCINAS",
-                    "NEW CHEM", "AQUASERVEIS", "AQUASERVEIS REUS", "PISCIBLUE", "PISCINAS DE LA FLOR",
-                    "PISCINAS JESUS", "INSTALACIONES PISCINAS JESUS", "PISCINAS LOS BALCONES S.L.U.", "PISCINAS PILIO",
-                    "PISCINES CENTER", "PISCINES GELMI", "PISCINES PIERA", "PISCISALUD", "POOLMARK",
-                    "SHOP LINER POOL", "SILLERO E HIJOS SL", "TECNODRY"
-                ]
-
-                with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
-                    # Buscamos la columna de tiempo (la primera de la tabla)
-                    col_hora_d1 = df1.columns[0]
-                    col_hora_d2 = df2.columns[0]
-                    horas = df1[col_hora_d1].unique()
-
-                    for proveedor in prov_listado:
-                        agenda_prov = []
-                        for h in horas:
-                            # Día 1
-                            socio_d1 = ""
-                            f1 = df1[df1[col_hora_d1] == h]
-                            for s in socios_mzb:
-                                if s in f1.columns and str(f1[s].iloc[0]) == str(proveedor):
-                                    socio_d1 = s
-                                    break
-                            # Día 2
-                            socio_d2 = ""
-                            f2 = df2[df2[col_hora_d2] == h]
-                            for s in socios_mzb:
-                                if s in f2.columns and str(f2[s].iloc[0]) == str(proveedor):
-                                    socio_d2 = s
-                                    break
-                            
-                            agenda_prov.append({
-                                'HORA': h,
-                                'DÍA 1 (Visita)': socio_d1,
-                                'HORA ': h,
-                                'DÍA 2 (Visita)': socio_d2
-                            })
-                        
-                        df_sheet = pd.DataFrame(agenda_prov)
-                        sh_name = str(proveedor)[:30].strip().replace('/','-')
-                        df_sheet.to_excel(writer, sheet_name=sh_name, index=False)
-                
-                return output.getvalue()
-
-            st.download_button(
-                label="📥 DESCARGAR PLANING PROVEEDORES",
-                data=generar_excel_por_proveedor(),
-                file_name="PLANING_PROVEEDORES_EXPOOL.xlsx",
-                mime="application/vnd.ms-excel",
-                use_container_width=True,
-                key="btn_prov_final_fixed"
-            )
 # --- CABECERA ---
 c1, c2, c3 = st.columns([1, 4, 1])
-with c1: 
-    if os.path.exists("portada.jpg"): st.image("portada.jpg", use_container_width=True)
+with c1: st.image("portada.jpg", use_container_width=True)
 with c2: 
     st.markdown('<p class="titulo-principal">EXPOOL 2026<br>PASAPORTE MZB</p>', unsafe_allow_html=True)
-    if os.path.exists("juntos.png"): st.image("juntos.png", use_container_width=True)
-with c3: 
-    if os.path.exists("planing_mzb.jpg"): st.image("planing_mzb.jpg", use_container_width=True)
+    st.image("juntos.png", use_container_width=True)
+with c3: st.image("portada.jpg", use_container_width=True)
 
 # --- VISTAS ---
 if vista == "🆘 AYUDA ZB":
     st.markdown('<div class="socio-card"><h2>🆘 AYUDA EXPOOL</h2></div>', unsafe_allow_html=True)
     st.link_button("💬 WHATSAPP ORGANIZACIÓN", "https://wa.me/34670379925?text=Hola%20Claudia,%20necesito%20ayuda...")
-
 elif vista == "🗺️ PLANO FERIA":
-    if os.path.exists("plano.jpg"): st.image("plano.jpg", use_container_width=True)
-
+    st.image("plano.jpg", use_container_width=True)
 elif vista == "🎉 MENÚS Y OCIO":
-    if os.path.exists("ocio.jpg"): st.image("ocio.jpg", use_container_width=True)
-    st.markdown('<div class="alergia-box">⚠️ Avisa de alergias a Claudia.</div>', unsafe_allow_html=True)
+    st.image("ocio.jpg", use_container_width=True)
     st.link_button("📲 AVISAR ALERGIAS", "https://wa.me/34670379925?text=Tengo%20una%20alergia...")
-
 elif vista == "🏛️ ASAMBLEA":
-    st.markdown('<div class="socio-card"><h1 style="margin:0; font-size: 32px;">🏛️ ASAMBLEA GENERAL</h1><p style="margin:0; color: white; font-size: 18px;">ACCESO RESTRINGIDO A SOCIOS</p></div>', unsafe_allow_html=True)
-    
-    # Sistema de protección
-    password = st.text_input("Introduce la clave de Socio para ver el orden del día:", type="password")
-    
-    if password == "ZB2026":
-        st.success("✅ Acceso concedido")
-        st.markdown('<div style="background-color: #111; padding: 15px; border-radius: 10px; border: 1px solid #FF8C00; color: #FF8C00; font-size: 20px; text-align: center; font-weight: bold;">📍 UBICACIÓN: Edificio Multiusos de Amposta</div>', unsafe_allow_html=True)
-        
-        st.markdown("<br>", unsafe_allow_html=True)
-        
-        c1, c2 = st.columns(2)
-        with c1:
-            st.markdown("""<div class="asamblea-card" style="padding: 20px;">
-                <h2 style="color: #FF8C00; font-size: 28px; margin-bottom: 5px;">📅 SESIÓN 1</h2>
-                <p style="font-size: 20px; margin-bottom: 2px;"><b>Lunes 2 de Marzo</b></p>
-                <p style="color: #bbb; font-size: 16px;">15:30h (1ª conv.) | 16:00h (2ª conv.)</p>
-                <hr style="border-color: #444;">
-                <ul style="list-style-type: none; padding-left: 0; font-size: 18px; line-height: 1.8;">
-                    <li><b style="color: #FF8C00;">1.</b> Bienvenida Presidente y Consejo.</li>
-                    <li><b style="color: #FF8C00;">2.</b> ALTAS y BAJAS Grupo ZB 2026.</li>
-                    <li><b style="color: #FF8C00;">3.</b> Actividades FERIA EXPOOL 2026.</li>
-                    <li><b style="color: #FF8C00;">4.</b> COMPRAS a PROVEEDORES 2025.</li>
-                    <li><b style="color: #FF8C00;">5.</b> PROVEEDORES 2026 y ZB AQUANATUR.</li>
-                </ul></div>""", unsafe_allow_html=True)
-        with c2:
-            st.markdown("""<div class="asamblea-card" style="padding: 20px;">
-                <h2 style="color: #FF8C00; font-size: 28px; margin-bottom: 5px;">📅 SESIÓN 2</h2>
-                <p style="font-size: 20px; margin-bottom: 2px;"><b>Jueves 5 de Marzo</b></p>
-                <p style="color: #bbb; font-size: 16px;">09:30h (1ª conv.) | 10:00h (2ª conv.)</p>
-                <hr style="border-color: #444;">
-                <ul style="list-style-type: none; padding-left: 0; font-size: 18px; line-height: 1.8;">
-                    <li><b style="color: #FF8C00;">6.</b> FIGURA SOCIO Y RAPPEL 2025.</li>
-                    <li><b style="color: #FF8C00;">7.</b> PROGRAMA ZB PLATINUM 2026.</li>
-                    <li><b style="color: #FF8C00;">8.</b> MARKETING, WEB y RR.SS.</li>
-                    <li><b style="color: #FF8C00;">9.</b> NUEVO CATÁLOGO ZB 2026-27.</li>
-                    <li><b style="color: #FF8C00;">10.</b> Ruegos y Preguntas.</li>
-                </ul></div>""", unsafe_allow_html=True)
-    elif password == "":
-        st.warning("Por favor, introduce la clave para continuar.")
-    else:
-        st.error("❌ Clave incorrecta.")
-
+    st.markdown('<div class="socio-card"><h3>Lunes 2 - 16:00h | Jueves 5 - 10:00h</h3></div>', unsafe_allow_html=True)
 elif vista == "AGENDA GENERAL":
     df = generar_datos_feria(dia_sel)
     for _, fila in df.iterrows():
@@ -301,7 +146,6 @@ elif vista == "AGENDA GENERAL":
             if fila["TIPO"] == "EVENTO": st.warning(fila[mzb_listado[0]])
             else:
                 for mzb in mzb_listado: st.write(f"🔹 {mzb} ➔ {fila[mzb]}")
-
 else: # MZB o Proveedor
     estado = obtener_estado_actual(sel, vista == "MZB")
     st.markdown(f'<div class="status-box">{estado}</div>', unsafe_allow_html=True)
@@ -317,18 +161,3 @@ else: # MZB o Proveedor
     buf = io.BytesIO()
     with pd.ExcelWriter(buf, engine='xlsxwriter') as wr: res.to_excel(wr, index=False)
     st.download_button("📥 DESCARGAR EXCEL", buf.getvalue(), f"{sel}.xlsx")
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

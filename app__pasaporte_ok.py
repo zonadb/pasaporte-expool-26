@@ -49,9 +49,10 @@ st.markdown("""
     """, unsafe_allow_html=True)
 
 # --- MENSAJE DE BIENVENIDA (MODAL) ---
-@st.dialog("🚀 ¡BIENVENIDO A EXPOOL 2026!")
+@st.dialog("🤝 ¡JUNTOS SOMOS MAS FUERTES! - EXPOOL 2026")
 def bienvenida():
-    st.write("Para una experiencia **TOP**, instala esta App en tu móvil:")
+    st.write("¡Bienvenido al punto de encuentro! Añade esta App a tu móvil:")
+    # ... resto del código ...
     st.markdown("""
     * **iPhone:** Pulsa el botón compartir (cuadrado con flecha) y elige **'Añadir a pantalla de inicio'**.
     * **Android:** Pulsa los 3 puntos y elige **'Instalar aplicación'**.
@@ -235,5 +236,6 @@ else: # MZB o Proveedor
     buf = io.BytesIO()
     with pd.ExcelWriter(buf, engine='xlsxwriter') as wr: res.to_excel(wr, index=False)
     st.download_button("📥 DESCARGAR EXCEL", buf.getvalue(), f"{sel}.xlsx")
+
 
 

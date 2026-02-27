@@ -138,7 +138,32 @@ elif vista == "🎉 MENÚS Y OCIO":
     st.image("ocio.jpg", use_container_width=True)
     st.link_button("📲 AVISAR ALERGIAS", "https://wa.me/34670379925?text=Tengo%20una%20alergia...")
 elif vista == "🏛️ ASAMBLEA":
-    st.markdown('<div class="socio-card"><h3>Lunes 2 - 16:00h | Jueves 5 - 10:00h</h3></div>', unsafe_allow_html=True)
+    st.markdown('<div class="socio-card"><h2 style="margin:0;">🏛️ ASAMBLEA GENERAL</h2><p style="margin:0; color: white;">GRUPO ZONA DE BAÑO S.COOP.</p></div>', unsafe_allow_html=True)
+    st.info("📍 UBICACIÓN: Edificio Multiusos de Amposta (Frente al Recinto Ferial)")
+    
+    c1, c2 = st.columns(2)
+    with c1:
+        st.markdown("""<div class="asamblea-card">
+            <h3 style="color: #FF8C00;">📅 SESIÓN 1</h3><p><b>Lunes 2 de Marzo</b></p>
+            <p><small>16:00h (2ª convocatoria)</small></p><hr>
+            <ul style="list-style-type: none; padding-left: 0; font-size: 13px;">
+                <li><b>1.</b> Bienvenida Presidente y Consejo.</li>
+                <li><b>2.</b> ALTAS y BAJAS Grupo ZB 2026.</li>
+                <li><b>3.</b> Actividades FERIA EXPOOL 2026.</li>
+                <li><b>4.</b> COMPRAS a PROVEEDORES 2025.</li>
+                <li><b>5.</b> PROVEEDORES 2026 y ZB AQUANATUR.</li>
+            </ul></div>""", unsafe_allow_html=True)
+    with c2:
+        st.markdown("""<div class="asamblea-card">
+            <h3 style="color: #FF8C00;">📅 SESIÓN 2</h3><p><b>Jueves 5 de Marzo</b></p>
+            <p><small>10:00h (2ª convocatoria)</small></p><hr>
+            <ul style="list-style-type: none; padding-left: 0; font-size: 13px;">
+                <li><b>6.</b> FIGURA SOCIO Y RAPPEL 2025.</li>
+                <li><b>7.</b> PROGRAMA ZB PLATINUM 2026.</li>
+                <li><b>8.</b> MARKETING, WEB y RR.SS.</li>
+                <li><b>9.</b> NUEVO CATÁLOGO ZB 2026-27.</li>
+                <li><b>10.</b> Ruegos y Preguntas.</li>
+            </ul></div>""", unsafe_allow_html=True)
 elif vista == "AGENDA GENERAL":
     df = generar_datos_feria(dia_sel)
     for _, fila in df.iterrows():
@@ -161,3 +186,4 @@ else: # MZB o Proveedor
     buf = io.BytesIO()
     with pd.ExcelWriter(buf, engine='xlsxwriter') as wr: res.to_excel(wr, index=False)
     st.download_button("📥 DESCARGAR EXCEL", buf.getvalue(), f"{sel}.xlsx")
+

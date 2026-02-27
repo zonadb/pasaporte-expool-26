@@ -25,14 +25,19 @@ st.markdown("""
     }
     [data-testid="stTable"] { width: 100% !important; font-size: 13px !important; color: white !important; }
     th { background-color: #FF8C00 !important; color: black !important; }
-    .stDownloadButton button {
+    .stDownloadButton button, .stLinkButton a {
         background-color: #FF8C00 !important; color: black !important;
         font-weight: bold !important; width: 100% !important; border-radius: 10px;
+        text-decoration: none; display: inline-block; text-align: center; padding: 10px 0;
+    }
+    .alergia-box {
+        background-color: #330000; color: #FF4B4B; padding: 15px; 
+        border-radius: 10px; border: 1px solid #FF4B4B; text-align: center; margin-top: 15px;
     }
     </style>
     """, unsafe_allow_html=True)
 
-# --- LISTADOS OFICIALES (AQUASERVEIS TRAS NEO SWIMMING) ---
+# --- LISTADOS OFICIALES ---
 mzb_listado = [
     "AIGUANET GARDEN AND POOL", "AISLANTES AISLAMAX", "AIT", "AZ PISCINAS", "CIPAGUA",
     "OCIO JARDIN CARRETERO S.L.", "AQUAINDESA", "CALDARIUM", "CONSAN PISCINAS", "COSTA PISCINAS",
@@ -97,8 +102,8 @@ def generar_datos_feria(dia):
 # --- SIDEBAR ---
 with st.sidebar:
     if os.path.exists("logo_mzb.jpg"): st.image("logo_mzb.jpg", use_container_width=True)
-    vista = st.radio("🔍 MENÚ:", ["AGENDA GENERAL", "MZB", "Proveedor / Stand", "🏛️ ASAMBLEA", "🗺️ PLANO FERIA"])
-    if vista not in ["🏛️ ASAMBLEA", "🗺️ PLANO FERIA"]:
+    vista = st.radio("🔍 MENÚ:", ["AGENDA GENERAL", "MZB", "Proveedor / Stand", "🏛️ ASAMBLEA", "🗺️ PLANO FERIA", "🎉 MENÚS Y OCIO"])
+    if vista not in ["🏛️ ASAMBLEA", "🗺️ PLANO FERIA", "🎉 MENÚS Y OCIO"]:
         dia_sel = st.selectbox("📅 JORNADA:", ["Día 1 (3 Marzo)", "Día 2 (4 Marzo)"])
         if vista == "MZB": sel = st.selectbox("👤 SOCIO:", mzb_listado)
         elif vista == "Proveedor / Stand": sel = st.selectbox("🏢 STAND:", prov_listado)
@@ -110,7 +115,7 @@ with c1: st.image("portada.jpg", use_container_width=True)
 with c2: 
     st.markdown('<p class="titulo-principal">EXPOOL 2026<br>PASAPORTE MZB</p>', unsafe_allow_html=True)
     st.image("juntos.png", use_container_width=True)
-with c3: st.image("planing_mzb.jpg", use_container_width=True)
+with c3: st.image("planning_mzb.jpg", use_container_width=True)
 
 # --- VISTAS ---
 if vista == "🏛️ ASAMBLEA":
@@ -123,6 +128,22 @@ elif vista == "🗺️ PLANO FERIA":
     st.markdown('<div class="socio-card"><h2>🗺️ PLANO DEL RECINTO FERIAL</h2></div>', unsafe_allow_html=True)
     if os.path.exists("plano.jpg"): st.image("plano.jpg", use_container_width=True)
     else: st.error("Archivo 'plano.jpg' no encontrado.")
+
+elif vista == "🎉 MENÚS Y OCIO":
+    st.markdown('<div class="socio-card"><h2>🎉 INFORMACIÓN DE OCIO Y MENÚS</h2></div>', unsafe_allow_html=True)
+    if os.path.exists("ocio.jpg"):
+        st.image("ocio.jpg", use_container_width=True)
+    
+    st.markdown("""
+        <div class="alergia-box">
+            ⚠️ <b>¡IMPORTANTE!</b><br>
+            Si tienes alguna alergia o intolerancia alimentaria y aún no lo has comunicado, 
+            por favor, avisa urgentemente a <b>Claudia</b>.
+        </div>
+    """, unsafe_allow_html=True)
+    
+    st.markdown("<br>", unsafe_allow_html=True)
+    st.link_button("📲 CONTACTAR CON CLAUDIA (WhatsApp)", "https://wa.me/34670379925?text=Hola%20Claudia,%20te%20escribo%20desde%20la%20App%20EXPOOL%20para%20comentarte%20un%20tema%20de%20alergias...")
 
 elif vista == "AGENDA GENERAL":
     df = generar_datos_feria(dia_sel)
@@ -158,6 +179,3 @@ else:
     col1, col2 = st.columns(2)
     with col1: st.table(res.head(m))
     with col2: st.table(res.tail(len(res)-m))
-
-
-

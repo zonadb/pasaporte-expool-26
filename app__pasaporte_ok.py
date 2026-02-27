@@ -246,7 +246,6 @@ c1, c2, c3 = st.columns([1, 4, 1])
 with c1: 
     if os.path.exists("portada.jpg"): st.image("portada.jpg", use_container_width=True)
 with c2: 
-    st.markdown('<p class="titulo-principal">EXPOOL 2026<br>PASAPORTE MZB</p>', unsafe_allow_html=True)
     if os.path.exists("juntos.png"): st.image("juntos.png", use_container_width=True)
 with c3: 
     if os.path.exists("planing_mzb.jpg"): st.image("planing_mzb.jpg", use_container_width=True)
@@ -339,6 +338,7 @@ else: # MZB o Proveedor
     buf = io.BytesIO()
     with pd.ExcelWriter(buf, engine='xlsxwriter') as wr: res.to_excel(wr, index=False)
     st.download_button("📥 DESCARGAR EXCEL", buf.getvalue(), f"{sel}.xlsx")
+
 
 
 

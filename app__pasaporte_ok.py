@@ -165,8 +165,16 @@ elif vista == "🗺️ PLANO FERIA":
     if os.path.exists("plano.jpg"): st.image("plano.jpg", use_container_width=True)
 
 elif vista == "🎉 MENÚS Y OCIO":
-    if os.path.exists("ocio.jpg"): st.image("ocio.jpg", use_container_width=True)
-    st.markdown('<div class="alergia-box">⚠️ Avisa de alergias a Claudia.</div>', unsafe_allow_html=True)
+    if os.path.exists("ocio.jpg"): 
+        st.image("ocio.jpg", use_container_width=True)
+    
+    # He añadido estilo directamente en el div para forzar el tamaño
+    st.markdown("""
+        <div class="alergia-box" style="font-size: 26px !important; font-weight: 900; line-height: 1.2; padding: 25px;">
+            ⚠️ AVISA DE ALERGIAS A CLAUDIA
+        </div>
+        """, unsafe_allow_html=True)
+    
     st.link_button("📲 AVISAR ALERGIAS", "https://wa.me/34670379925?text=Tengo%20una%20alergia...")
 
 elif vista == "🏛️ ASAMBLEA":
@@ -236,6 +244,7 @@ else: # MZB o Proveedor
     buf = io.BytesIO()
     with pd.ExcelWriter(buf, engine='xlsxwriter') as wr: res.to_excel(wr, index=False)
     st.download_button("📥 DESCARGAR EXCEL", buf.getvalue(), f"{sel}.xlsx")
+
 
 
 

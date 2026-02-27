@@ -144,12 +144,13 @@ def obtener_estado_actual(nombre, es_mzb):
                 return f"📍 RECIBIENDO A: {visita}"
     return "😴 FERIA CERRADA POR HOY"
 
-# --- SIDEBAR ---
+# --- SIDEBAR (BORRA CUALQUIER OTRA COPIA DE ESTO QUE TENGAS) ---
 with st.sidebar:
     if os.path.exists("logo_mzb.jpg"): 
         st.image("logo_mzb.jpg", use_container_width=True)
     
-    vista = st.radio("🔍 MENÚ:", ["AGENDA GENERAL", "MZB", "Proveedor / Stand", "🏛️ ASAMBLEA", "🗺️ PLANO FERIA", "🎉 MENÚS Y OCIO", "🆘 AYUDA ZB"])
+    # Este es el elemento que estaba duplicado:
+    vista = st.radio("🔍 MENÚ:", ["AGENDA GENERAL", "MZB", "Proveedor / Stand", "🏛️ ASAMBLEA", "🗺️ PLANO FERIA", "🎉 MENÚS Y OCIO", "🆘 AYUDA ZB"], key="menu_principal")
     
     if vista not in ["🏛️ ASAMBLEA", "🗺️ PLANO FERIA", "🎉 MENÚS Y OCIO", "🆘 AYUDA ZB"]:
         dia_sel = st.selectbox("📅 JORNADA:", ["Día 1 (3 Marzo)", "Día 2 (4 Marzo)"])
@@ -165,136 +166,34 @@ with st.sidebar:
                 output = io.BytesIO()
                 df_d1 = generar_datos_feria("Día 1 (3 Marzo)")
                 df_d2 = generar_datos_feria("Día 2 (4 Marzo)")
-                
                 with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
-                    # Buscamos solo nombres que existan en el DataFrame
                     columnas_reales = df_d1.columns.tolist()
-                    
                     for nombre in lista_nombres:
                         if nombre in columnas_reales:
-                            # Extraemos datos y forzamos copia para evitar errores
                             v_d1 = df_d1[['HORA', nombre]].copy()
                             v_d1.columns = ['HORA', 'DÍA 1 (3 Marzo)']
-                            
                             v_d2 = df_d2[['HORA', nombre]].copy()
                             v_d2.columns = ['HORA', 'DÍA 2 (4 Marzo)']
-                            
-                            # Unimos en formato 2 columnas por día
                             df_final = pd.concat([v_d1.reset_index(drop=True), v_d2.reset_index(drop=True)], axis=1)
-                            
-                            # Nombre de pestaña seguro
                             pestaña = str(nombre)[:30].strip().replace(':','').replace('/','').replace('\\','')
                             df_final.to_excel(writer, sheet_name=pestaña, index=False)
-                
                 return output.getvalue()
 
-            # Botones de descarga alineados
             col_a, col_b = st.columns(2)
-            
             with col_a:
-                data_mzb = generar_excel_compacto(mzb_listado, "Socio")
                 st.download_button(
                     label="📥 EXCEL SOCIOS",
-                    data=data_mzb,
-                    file_name="PLANING_SOCIOS_COMPACTO.xlsx",
-                    use_container_width=True
+                    data=generar_excel_compacto(mzb_listado, "Socio"),
+                    file_name="PLANING_SOCIOS.xlsx",
+                    key="btn_mzb"
                 )
-            
             with col_b:
-                data_prov = generar_excel_compacto(prov_listado, "Proveedor")
                 st.download_button(
                     label="📥 EXCEL PROVEEDORES",
-                    data=data_prov,
-                    file_name="PLANING_PROVEEDORES_COMPACTO.xlsx",
-                    use_container_width=True
-                )# --- SIDEBAR ---
-with st.sidebar:
-    if os.path.exists("logo_mzb.jpg"): 
-        st.image("logo_mzb.jpg", use_container_width=True)
-    
-    vista = st.radio("🔍 MENÚ:", ["AGENDA GENERAL", "MZB", "Proveedor / Stand", "🏛️ ASAMBLEA", "🗺️ PLANO FERIA", "🎉 MENÚS Y OCIO", "🆘 AYUDA ZB"])
-    
-    if vista not in ["🏛️ ASAMBLEA", "🗺️ PLANO FERIA", "🎉 MENÚS Y OCIO", "🆘 AYUDA ZB"]:
-        dia_sel = st.selectbox("📅 JORNADA:", ["Día 1 (3 Marzo)", "Día 2 (4 Marzo)"])
-        sel = st.selectbox("👤 SELECCIONA NOMBRE:", mzb_listado if vista == "MZB" else prov_listado)
-        st.divider()
-
-    with st.expander("🔐 ACCESO ORGANIZACIÓN"):
-        pwd_admin = st.text_input("Clave Admin:", type="password")
-        if pwd_admin == "cipoteboys":
-            st.write("### 📂 Generar Listados Maestros")
-
-            def generar_excel_compacto(lista_nombres, tipo):
-                output = io.BytesIO()
-                df_d1 = generar_datos_feria("Día 1 (3 Marzo)")
-                df_d2 = generar_datos_feria("Día 2 (4 Marzo)")
-                
-                with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
-                    # Buscamos solo nombres que existan en el DataFrame
-                    columnas_reales = df_d1.columns.tolist()
-                    
-                    for nombre in lista_nombres:
-                        if nombre in columnas_reales:
-                            # Extraemos datos y forzamos copia para evitar errores
-                            v_d1 = df_d1[['HORA', nombre]].copy()
-                            v_d1.columns = ['HORA', 'DÍA 1 (3 Marzo)']
-                            
-                            v_d2 = df_d2[['HORA', nombre]].copy()
-                            v_d2.columns = ['HORA', 'DÍA 2 (4 Marzo)']
-                            
-                            # Unimos en formato 2 columnas por día
-                            df_final = pd.concat([v_d1.reset_index(drop=True), v_d2.reset_index(drop=True)], axis=1)
-                            
-                            # Nombre de pestaña seguro
-                            pestaña = str(nombre)[:30].strip().replace(':','').replace('/','').replace('\\','')
-                            df_final.to_excel(writer, sheet_name=pestaña, index=False)
-                
-                return output.getvalue()
-
-            # Botones de descarga alineados
-            col_a, col_b = st.columns(2)
-            
-            with col_a:
-                data_mzb = generar_excel_compacto(mzb_listado, "Socio")
-                st.download_button(
-                    label="📥 EXCEL SOCIOS",
-                    data=data_mzb,
-                    file_name="PLANING_SOCIOS_COMPACTO.xlsx",
-                    use_container_width=True
+                    data=generar_excel_compacto(prov_listado, "Proveedor"),
+                    file_name="PLANING_PROVEEDORES.xlsx",
+                    key="btn_prov"
                 )
-            
-            with col_b:
-                data_prov = generar_excel_compacto(prov_listado, "Proveedor")
-                st.download_button(
-                    label="📥 EXCEL PROVEEDORES",
-                    data=data_prov,
-                    file_name="PLANING_PROVEEDORES_COMPACTO.xlsx",
-                    use_container_width=True
-                )
-
-            # --- BOTONES DE DESCARGA ---
-            col_a, col_b = st.columns(2)
-            
-            with col_a:
-                excel_mzb = generar_excel_compacto(mzb_listado, "Socio")
-                st.download_button(
-                    label="📥 EXCEL PARA SOCIOS",
-                    data=excel_mzb,
-                    file_name="PLANING_SOCIOS_COMPACTO.xlsx",
-                    mime="application/vnd.ms-excel",
-                    use_container_width=True
-                )
-            
-            with col_b:
-                excel_prov = generar_excel_compacto(prov_listado, "Proveedor")
-                st.download_button(
-                    label="📥 EXCEL PARA PROVEEDORES",
-                    data=excel_prov,
-                    file_name="PLANING_PROVEEDORES_COMPACTO.xlsx",
-                    mime="application/vnd.ms-excel",
-                    use_container_width=True
-                )
-
 # --- CABECERA ---
 c1, c2, c3 = st.columns([1, 4, 1])
 with c1: 
@@ -385,6 +284,7 @@ else: # MZB o Proveedor
     buf = io.BytesIO()
     with pd.ExcelWriter(buf, engine='xlsxwriter') as wr: res.to_excel(wr, index=False)
     st.download_button("📥 DESCARGAR EXCEL", buf.getvalue(), f"{sel}.xlsx")
+
 
 
 

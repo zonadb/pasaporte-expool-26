@@ -165,27 +165,53 @@ with st.sidebar:
         if pwd_admin == "cipoteboys":
             st.success("✅ Acceso Concedido")
             
-            # Generamos los dos días tal cual están en la App
+            # --- LÓGICA DE DATOS ---
+            # Generamos las tablas base de la feria
             df1 = generar_datos_feria("Día 1 (3 Marzo)")
             df2 = generar_datos_feria("Día 2 (4 Marzo)")
+
+            # --- BOTÓN 1: EXCEL SOCIOS (MZB) ---
+            # Filtramos solo las columnas que pertenecen a los socios MZB
+            cols_mzb_d1 = ['HORA'] + [c for c in df1.columns if c in mzb_listado]
+            cols_mzb_d2 = ['HORA'] + [c for c in df2.columns if c in mzb_listado]
             
-            # Los pegamos: Día 1 a la izquierda, Día 2 a la derecha
-            # Esto crea un cuadrante gigante con todas las visitas de todos
-            df_total = pd.concat([df1.reset_index(drop=True), df2.reset_index(drop=True)], axis=1)
+            df_mzb_total = pd.concat([df1[cols_mzb_d1].reset_index(drop=True), 
+                                    df2[cols_mzb_d2].reset_index(drop=True)], axis=1)
+
+            # --- BOTÓN 2: EXCEL PROVEEDORES ---
+            # Filtramos solo las columnas que pertenecen a los proveedores
+            cols_prov_d1 = ['HORA'] + [c for c in df1.columns if c in prov_listado]
+            cols_prov_d2 = ['HORA'] + [c for c in df2.columns if c in prov_listado]
             
-            # Convertimos a Excel de forma ultra-simple
-            output = io.BytesIO()
-            with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
-                df_total.to_excel(writer, sheet_name='PLANING_EXPOOL', index=False)
+            df_prov_total = pd.concat([df1[cols_prov_d1].reset_index(drop=True), 
+                                     df2[cols_prov_d2].reset_index(drop=True)], axis=1)
+
+            # --- INTERFAZ DE DESCARGA ---
+            col_a, col_b = st.columns(2)
             
-            st.download_button(
-                label="📥 DESCARGAR CUADRANTE COMPLETO",
-                data=output.getvalue(),
-                file_name="CUADRANTE_EXPOOL_2026.xlsx",
-                mime="application/vnd.ms-excel",
-                use_container_width=True,
-                key="btn_simple_final"
-            )
+            with col_a:
+                out_mzb = io.BytesIO()
+                with pd.ExcelWriter(out_mzb, engine='xlsxwriter') as writer:
+                    df_mzb_total.to_excel(writer, sheet_name='PLANING_SOCIOS', index=False)
+                st.download_button(
+                    label="📥 EXCEL SOCIOS",
+                    data=out_mzb.getvalue(),
+                    file_name="PLANING_SOCIOS_EXPOOL.xlsx",
+                    use_container_width=True,
+                    key="btn_mzb_simple"
+                )
+
+            with col_b:
+                out_prov = io.BytesIO()
+                with pd.ExcelWriter(out_prov, engine='xlsxwriter') as writer:
+                    df_prov_total.to_excel(writer, sheet_name='PLANING_PROVEEDORES', index=False)
+                st.download_button(
+                    label="📥 EXCEL PROVEEDORES",
+                    data=out_prov.getvalue(),
+                    file_name="PLANING_PROVEEDORES_EXPOOL.xlsx",
+                    use_container_width=True,
+                    key="btn_prov_simple"
+                )
 # --- VISTAS ---
 if vista == "🆘 AYUDA ZB":
     st.markdown('<div class="socio-card"><h2>🆘 AYUDA EXPOOL</h2></div>', unsafe_allow_html=True)
@@ -266,6 +292,7 @@ else: # MZB o Proveedor
     buf = io.BytesIO()
     with pd.ExcelWriter(buf, engine='xlsxwriter') as wr: res.to_excel(wr, index=False)
     st.download_button("📥 DESCARGAR EXCEL", buf.getvalue(), f"{sel}.xlsx")
+
 
 
 

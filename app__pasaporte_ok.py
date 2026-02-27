@@ -169,16 +169,48 @@ elif vista == "🎉 MENÚS Y OCIO":
     st.link_button("📲 AVISAR ALERGIAS", "https://wa.me/34670379925?text=Tengo%20una%20alergia...")
 
 elif vista == "🏛️ ASAMBLEA":
-    st.markdown('<div class="socio-card"><h2 style="margin:0;">🏛️ ASAMBLEA GENERAL</h2><p style="margin:0; color: white;">ACCESO RESTRINGIDO A SOCIOS</p></div>', unsafe_allow_html=True)
-    password = st.text_input("Introduce la clave de Socio:", type="password")
+    st.markdown('<div class="socio-card"><h1 style="margin:0; font-size: 32px;">🏛️ ASAMBLEA GENERAL</h1><p style="margin:0; color: white; font-size: 18px;">ACCESO RESTRINGIDO A SOCIOS</p></div>', unsafe_allow_html=True)
+    
+    # Sistema de protección
+    password = st.text_input("Introduce la clave de Socio para ver el orden del día:", type="password")
+    
     if password == "ZB2026":
         st.success("✅ Acceso concedido")
-        st.info("📍 UBICACIÓN: Edificio Multiusos de Amposta")
-        col1, col2 = st.columns(2)
-        with col1:
-            st.markdown("""<div class="asamblea-card"><h3 style="color: #FF8C00;">📅 SESIÓN 1</h3><p><b>Lunes 2 de Marzo</b></p><p><small>15:30h (1ª) | 16:00h (2ª)</small></p><hr><ul style="list-style-type: none; padding-left: 0; font-size: 13px;"><li><b>1.</b> Bienvenida.</li><li><b>2.</b> Altas/Bajas.</li><li><b>3.</b> Feria Expool.</li><li><b>4.</b> Compras 2025.</li><li><b>5.</b> Proveedores 2026.</li></ul></div>""", unsafe_allow_html=True)
-        with col2:
-            st.markdown("""<div class="asamblea-card"><h3 style="color: #FF8C00;">📅 SESIÓN 2</h3><p><b>Jueves 5 de Marzo</b></p><p><small>09:30h (1ª) | 10:00h (2ª)</small></p><hr><ul style="list-style-type: none; padding-left: 0; font-size: 13px;"><li><b>6.</b> Rappel 2025.</li><li><b>7.</b> Platinum 2026.</li><li><b>8.</b> Marketing/Web.</li><li><b>9.</b> Catálogo 26-27.</li><li><b>10.</b> Ruegos.</li></ul></div>""", unsafe_allow_html=True)
+        st.markdown('<div style="background-color: #111; padding: 15px; border-radius: 10px; border: 1px solid #FF8C00; color: #FF8C00; font-size: 20px; text-align: center; font-weight: bold;">📍 UBICACIÓN: Edificio Multiusos de Amposta</div>', unsafe_allow_html=True)
+        
+        st.markdown("<br>", unsafe_allow_html=True)
+        
+        c1, c2 = st.columns(2)
+        with c1:
+            st.markdown("""<div class="asamblea-card" style="padding: 20px;">
+                <h2 style="color: #FF8C00; font-size: 28px; margin-bottom: 5px;">📅 SESIÓN 1</h2>
+                <p style="font-size: 20px; margin-bottom: 2px;"><b>Lunes 2 de Marzo</b></p>
+                <p style="color: #bbb; font-size: 16px;">15:30h (1ª conv.) | 16:00h (2ª conv.)</p>
+                <hr style="border-color: #444;">
+                <ul style="list-style-type: none; padding-left: 0; font-size: 18px; line-height: 1.8;">
+                    <li><b style="color: #FF8C00;">1.</b> Bienvenida Presidente y Consejo.</li>
+                    <li><b style="color: #FF8C00;">2.</b> ALTAS y BAJAS Grupo ZB 2026.</li>
+                    <li><b style="color: #FF8C00;">3.</b> Actividades FERIA EXPOOL 2026.</li>
+                    <li><b style="color: #FF8C00;">4.</b> COMPRAS a PROVEEDORES 2025.</li>
+                    <li><b style="color: #FF8C00;">5.</b> PROVEEDORES 2026 y ZB AQUANATUR.</li>
+                </ul></div>""", unsafe_allow_html=True)
+        with c2:
+            st.markdown("""<div class="asamblea-card" style="padding: 20px;">
+                <h2 style="color: #FF8C00; font-size: 28px; margin-bottom: 5px;">📅 SESIÓN 2</h2>
+                <p style="font-size: 20px; margin-bottom: 2px;"><b>Jueves 5 de Marzo</b></p>
+                <p style="color: #bbb; font-size: 16px;">09:30h (1ª conv.) | 10:00h (2ª conv.)</p>
+                <hr style="border-color: #444;">
+                <ul style="list-style-type: none; padding-left: 0; font-size: 18px; line-height: 1.8;">
+                    <li><b style="color: #FF8C00;">6.</b> FIGURA SOCIO Y RAPPEL 2025.</li>
+                    <li><b style="color: #FF8C00;">7.</b> PROGRAMA ZB PLATINUM 2026.</li>
+                    <li><b style="color: #FF8C00;">8.</b> MARKETING, WEB y RR.SS.</li>
+                    <li><b style="color: #FF8C00;">9.</b> NUEVO CATÁLOGO ZB 2026-27.</li>
+                    <li><b style="color: #FF8C00;">10.</b> Ruegos y Preguntas.</li>
+                </ul></div>""", unsafe_allow_html=True)
+    elif password == "":
+        st.warning("Por favor, introduce la clave para continuar.")
+    else:
+        st.error("❌ Clave incorrecta.")
 
 elif vista == "AGENDA GENERAL":
     df = generar_datos_feria(dia_sel)
@@ -203,4 +235,5 @@ else: # MZB o Proveedor
     buf = io.BytesIO()
     with pd.ExcelWriter(buf, engine='xlsxwriter') as wr: res.to_excel(wr, index=False)
     st.download_button("📥 DESCARGAR EXCEL", buf.getvalue(), f"{sel}.xlsx")
+
 

@@ -5,18 +5,62 @@ import io
 import os
 import pytz
 
-# 1. CONFIGURACIÓN TOP (Logo en la pestaña)
+# 1. CONFIGURACIÓN DE PÁGINA
 st.set_page_config(
-# --- FORZAR ICONO PERSONALIZADO (PWA ICON) ---
-# Esto inyecta el código necesario para que Android (Chrome/Samsung) y iOS reconozcan tu logo
+    page_title="EXPOOL 2026 - Pasaporte MZB", 
+    layout="wide", 
+    page_icon="logo_mzb.jpg"
+)
+
+# 2. ICONO PARA PANTALLA DE INICIO (Evita el logo de Streamlit)
+# Sustituye la URL por el enlace 'Raw' de tu GitHub para que sea permanente
+URL_LOGO_MZB = "https://raw.githubusercontent.com/tu-usuario/tu-repo/main/logo_mzb.jpg"
+
 st.markdown(f"""
     <head>
-        <link rel="icon" href="https://github.com/zonadb/pasaporte-expool-26/blob/main/logo_mzb.jpg">
-        <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/TU_USUARIO/TU_REPO/main/logo_mzb.jpg">
+        <link rel="apple-touch-icon" href="{URL_LOGO_MZB}">
+        <link rel="icon" href="{URL_LOGO_MZB}">
         <meta name="mobile-web-app-capable" content="yes">
-        <meta name="apple-mobile-web-app-title" content="EXPOOL 2026">
     </head>
-    """, unsafe_allow_html=True)  
+    """, unsafe_allow_html=True)
+
+# 3. CSS Y CABECERA RESPONSIVA
+st.markdown("""
+    <style>
+    .main { background-color: #000000; }
+    [data-testid="stAppViewContainer"] { background-color: #000000; }
+    
+    .cabecera-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 20px;
+        margin-bottom: 20px;
+    }
+    .img-cabecera {
+        max-width: 45%;
+        height: auto;
+        border-radius: 10px;
+    }
+    @media (max-width: 768px) {
+        .cabecera-container { flex-direction: column; }
+        .img-cabecera { max-width: 95%; }
+    }
+    
+    /* Estilos de tablas y botones */
+    [data-testid="stTable"] { background-color: #1a1a1a !important; border-radius: 10px; }
+    table { color: white !important; }
+    th { background-color: #FF8C00 !important; color: black !important; }
+    .stDownloadButton button { background-color: #FF8C00 !important; color: black !important; font-weight: bold; }
+    </style>
+    
+    <div class="cabecera-container">
+        <img src="https://raw.githubusercontent.com/tu-usuario/tu-repo/main/portada.jpg" class="img-cabecera">
+        <img src="https://raw.githubusercontent.com/tu-usuario/tu-repo/main/juntos.png" class="img-cabecera">
+    </div>
+    """, unsafe_allow_html=True)
+
+# --- A PARTIR DE AQUÍ SIGUE TU CÓDIGO DE LISTADOS ---
     page_title="EXPOOL 2026 - Pasaporte MZB", 
     layout="wide", 
     page_icon="logo_mzb.jpg" if os.path.exists("logo_mzb.jpg") else "💧"
@@ -327,6 +371,7 @@ else: # MZB o Proveedor
     buf = io.BytesIO()
     with pd.ExcelWriter(buf, engine='xlsxwriter') as wr: res.to_excel(wr, index=False)
     st.download_button("📥 DESCARGAR EXCEL", buf.getvalue(), f"{sel}.xlsx")
+
 
 
 

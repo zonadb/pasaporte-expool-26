@@ -145,54 +145,40 @@ def obtener_estado_actual(nombre, es_mzb):
     return "😴 FERIA CERRADA POR HOY"
 
 # --- SIDEBAR (BORRA CUALQUIER OTRA COPIA DE ESTO QUE TENGAS) ---
-with st.sidebar:
-    if os.path.exists("logo_mzb.jpg"): 
-        st.image("logo_mzb.jpg", use_container_width=True)
-    
-    # Este es el elemento que estaba duplicado:
-    vista = st.radio("🔍 MENÚ:", ["AGENDA GENERAL", "MZB", "Proveedor / Stand", "🏛️ ASAMBLEA", "🗺️ PLANO FERIA", "🎉 MENÚS Y OCIO", "🆘 AYUDA ZB"], key="menu_principal")
-    
-    if vista not in ["🏛️ ASAMBLEA", "🗺️ PLANO FERIA", "🎉 MENÚS Y OCIO", "🆘 AYUDA ZB"]:
-        dia_sel = st.selectbox("📅 JORNADA:", ["Día 1 (3 Marzo)", "Día 2 (4 Marzo)"])
-        sel = st.selectbox("👤 SELECCIONA NOMBRE:", mzb_listado if vista == "MZB" else prov_listado)
-        st.divider()
-
-    with st.expander("🔐 ACCESO ORGANIZACIÓN"):
+with st.expander("🔐 ACCESO ORGANIZACIÓN"):
         pwd_admin = st.text_input("Clave Admin:", type="password")
-       if pwd_admin == "cipoteboys":
+        if pwd_admin == "cipoteboys":
             st.write("### 📂 Generar Listados Maestros")
             
             def descargar_excel_seguro():
                 output = io.BytesIO()
-                # Obtenemos los datos brutos de cada día
                 df_d1 = generar_datos_feria("Día 1 (3 Marzo)")
                 df_d2 = generar_datos_feria("Día 2 (4 Marzo)")
                 
                 with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
-                    # Buscamos qué columnas (nombres) hay realmente en la tabla generada
                     columnas_disponibles = [c for c in df_d1.columns if c != 'HORA']
-                    
                     for nombre in columnas_disponibles:
                         try:
-                            # Creamos el plan de 2 columnas para el socio/proveedor actual
-                            # Solo si el nombre existe en ambos días
                             if nombre in df_d1.columns and nombre in df_d2.columns:
                                 v_d1 = df_d1[['HORA', nombre]].copy()
                                 v_d1.columns = ['HORA', 'DÍA 1 (3 Mar)']
-                                
                                 v_d2 = df_d2[['HORA', nombre]].copy()
                                 v_d2.columns = ['HORA', 'DÍA 2 (4 Mar)']
-                                
                                 df_final = pd.concat([v_d1.reset_index(drop=True), v_d2.reset_index(drop=True)], axis=1)
-                                
-                                # Limpieza extrema del nombre de la pestaña
                                 sheet_name = str(nombre)[:30].strip().replace('/','-').replace(':','').replace('*','')
                                 df_final.to_excel(writer, sheet_name=sheet_name, index=False)
                         except:
-                            continue # Si uno falla, saltamos al siguiente sin romper la app
-                
+                            continue
                 return output.getvalue()
 
+            st.download_button(
+                label="📥 DESCARGAR PLANING COMPLETO (Pestañas)",
+                data=descargar_excel_seguro(),
+                file_name="PLANING_EXPOOL_2026.xlsx",
+                mime="application/vnd.ms-excel",
+                use_container_width=True,
+                key="btn_descarga_maestra"
+            )
             # BOTÓN ÚNICO
             st.download_button(
                 label="📥 DESCARGAR PLANING COMPLETO (Pestañas)",
@@ -293,6 +279,7 @@ else: # MZB o Proveedor
     buf = io.BytesIO()
     with pd.ExcelWriter(buf, engine='xlsxwriter') as wr: res.to_excel(wr, index=False)
     st.download_button("📥 DESCARGAR EXCEL", buf.getvalue(), f"{sel}.xlsx")
+
 
 
 

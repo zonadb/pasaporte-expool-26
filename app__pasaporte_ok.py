@@ -154,7 +154,7 @@ with st.sidebar:
         st.divider()
     with st.expander("🔐 ACCESO ORGANIZACIÓN"):
         pwd_admin = st.text_input("Clave Admin:", type="password")
-        if pwd_admin == "EXPOOL2026":
+        if pwd_admin == "cipoteboys":
             st.write("Generar backup completo:")
             df_d1 = generar_datos_feria("Día 1 (3 Marzo)")
             df_d2 = generar_datos_feria("Día 2 (4 Marzo)")
@@ -262,6 +262,7 @@ else: # MZB o Proveedor
     buf = io.BytesIO()
     with pd.ExcelWriter(buf, engine='xlsxwriter') as wr: res.to_excel(wr, index=False)
     st.download_button("📥 DESCARGAR EXCEL", buf.getvalue(), f"{sel}.xlsx")
+
 
 
 

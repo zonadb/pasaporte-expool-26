@@ -14,7 +14,7 @@ st.set_page_config(
 
 # --- 2. ESTILOS Y EFECTOS WAU CORREGIDOS ---
 st.markdown(f"""
-   .stMarkdown div, .stMarkdown p, .stMarkdown span, .stText, p, span, li {
+  .stMarkdown div, .stMarkdown p, .stMarkdown span, .stText, p, span, li {
         color: #FFFFFF !important;
         font-size: 1.1rem !important;
     }
@@ -410,6 +410,7 @@ else: # MZB o Proveedor
     buf = io.BytesIO()
     with pd.ExcelWriter(buf, engine='xlsxwriter') as wr: res.to_excel(wr, index=False)
     st.download_button("📥 DESCARGAR EXCEL", buf.getvalue(), f"{sel}.xlsx")
+
 
 
 

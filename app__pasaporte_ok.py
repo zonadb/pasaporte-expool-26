@@ -7,9 +7,9 @@ import pytz
 
 # 1. CONFIGURACIÓN DE PÁGINA (Sintaxis corregida)
 st.set_page_config(
-    page_title="EXPOOL 2026 - Pasaporte MZB", 
-    layout="wide", 
-    page_icon="logo_mzb.jpg"
+    page_title="EXPOOL 2026",
+    page_icon="logo_mzb.jpg",  # <--- AQUÍ va tu logo
+    layout="wide"
 )
 
 # --- 2. TÍTULO ESTILO UNIVERSAL (VERSIÓN ORIGINAL RECUPERADA) ---
@@ -345,6 +345,7 @@ else: # MZB o Proveedor
     buf = io.BytesIO()
     with pd.ExcelWriter(buf, engine='xlsxwriter') as wr: res.to_excel(wr, index=False)
     st.download_button("📥 DESCARGAR EXCEL", buf.getvalue(), f"{sel}.xlsx")
+
 
 
 

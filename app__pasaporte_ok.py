@@ -12,88 +12,60 @@ st.set_page_config(
     page_icon="logo_mzb.jpg"
 )
 
-# 2. TÍTULO ESTILO UNIVERSAL CON ILUMINACIÓN POSTERIOR
-# --- 2. ESTILOS Y EFECTOS WAU CORREGIDOS ---
+# --- 2. TÍTULO XL ESTILO UNIVERSAL CON ILUMINACIÓN POSTERIOR ---
 st.markdown(f"""
     <style>
-    /* Fondo con degradado radial tipo cine */
-    .main {{ 
-        background: radial-gradient(circle, #1a1a1a 0%, #000000 100%) !important; 
-    }}
-    [data-testid="stAppViewContainer"] {{ 
-        background: radial-gradient(circle, #1a1a1a 0%, #000000 100%) !important; 
-    }}
-
-    /* Animación del Título Universal */
+    /* Animación del Título con Brillo Expandido */
     @keyframes neon-glow {{
-        0% {{ text-shadow: 0 0 10px #FF8C00, 0 0 20px #FF8C00; }}
-        50% {{ text-shadow: 0 0 20px #FF8C00, 0 0 40px #FF4500; }}
-        100% {{ text-shadow: 0 0 10px #FF8C00, 0 0 20px #FF8C00; }}
-    }}
-    .titulo-universal {{
-        color: white; font-family: 'Arial Black', sans-serif;
-        font-size: 3.2rem; font-weight: 900; text-transform: uppercase;
-        text-align: center; margin-top: 10px; letter-spacing: 4px;
-        animation: neon-glow 3s infinite;
-    }}
-
-    /* --- EL EFECTO WAU: BARRIDO DE LUZ EN BOTONES --- */
-    @keyframes shine {{
-        0% {{ left: -100%; }}
-        20% {{ left: 100%; }}
-        100% {{ left: 100%; }}
-    }}
-
-    .stDownloadButton button, .stLinkButton a {{
-        position: relative !important;
-        overflow: hidden !important;
-        background: linear-gradient(135deg, #FF8C00 0%, #FF4500 100%) !important;
-        color: black !important;
-        font-weight: bold !important;
-        border: none !important;
-        border-radius: 12px !important;
-        padding: 15px !important;
-        transition: transform 0.2s ease !important;
-        display: flex; justify-content: center;
-        text-decoration: none !important;
-    }}
-
-    /* La capa de brillo que cruza el botón */
-    .stDownloadButton button::after, .stLinkButton a::after {{
-        content: '';
-        position: absolute;
-        top: 0;
-        left: -100%;
-        width: 60%;
-        height: 100%;
-        background: linear-gradient(
-            90deg, 
-            rgba(255,255,255,0) 0%, 
-            rgba(255,255,255,0.5) 50%, 
-            rgba(255,255,255,0) 100%
-        );
-        transform: skewX(-25deg);
-        animation: shine 4s infinite;
-    }}
-
-    .stDownloadButton button:hover {{
-        transform: scale(1.02);
-        box-shadow: 0 0 15px rgba(255, 140, 0, 0.5);
+        0% {{ text-shadow: 0 0 15px #FF8C00, 0 0 30px #FF8C00, 0 0 45px #FF4500; }}
+        50% {{ text-shadow: 0 0 25px #FF8C00, 0 0 50px #FF8C00, 0 0 70px #FF4500; }}
+        100% {{ text-shadow: 0 0 15px #FF8C00, 0 0 30px #FF8C00, 0 0 45px #FF4500; }}
     }}
     
-    /* Estilo de las tablas */
-    [data-testid="stTable"] {{ 
-        background-color: rgba(26, 26, 26, 0.8) !important; 
-        border-radius: 15px; 
-        border: 1px solid #333;
+    .titulo-universal-xl {{
+        color: white; 
+        font-family: 'Arial Black', Gadget, sans-serif;
+        font-size: 5.5rem; /* TAMAÑO GIGANTE */
+        font-weight: 900; 
+        text-transform: uppercase;
+        text-align: center; 
+        margin-top: 5px; 
+        margin-bottom: 0px;
+        line-height: 0.9; /* Pegamos un poco las letras para estilo cine */
+        letter-spacing: -2px; /* Un toque más compacto para que quepa bien */
+        animation: neon-glow 3s infinite;
+        -webkit-text-stroke: 1px rgba(255, 255, 255, 0.1); /* Perfilado sutil */
     }}
-    th {{ background-color: #FF8C00 !important; color: black !important; }}
-    td {{ color: white !important; }}
+
+    .subtitulo-mzb {{
+        color: #FF8C00;
+        font-size: 1.4rem;
+        font-weight: bold;
+        text-transform: uppercase;
+        text-align: center;
+        letter-spacing: 15px; /* Súper espaciado bajo el título grande */
+        margin-top: -10px;
+        margin-bottom: 30px;
+        opacity: 0.9;
+        text-shadow: 0 0 10px rgba(255, 140, 0, 0.5);
+    }}
+
+    /* Ajuste para que en móviles no se corte el título XL */
+    @media (max-width: 768px) {{
+        .titulo-universal-xl {{
+            font-size: 3.2rem; /* Tamaño optimizado para pantalla vertical */
+            letter-spacing: 1px;
+        }}
+        .subtitulo-mzb {{
+            font-size: 0.9rem;
+            letter-spacing: 5px;
+        }}
+    }}
     </style>
     
     <div>
-        <h1 class="titulo-universal">EXPOOL 2026</h1>
-        <p style="color: #FF8C00; text-align: center; letter-spacing: 10px; font-weight: bold; margin-bottom: 20px;">PASAPORTE MZB</p>
+        <h1 class="titulo-universal-xl">EXPOOL 2026</h1>
+        <p class="subtitulo-mzb">PASAPORTE MZB</p>
     </div>
     """, unsafe_allow_html=True)
 
@@ -387,6 +359,7 @@ else: # MZB o Proveedor
     buf = io.BytesIO()
     with pd.ExcelWriter(buf, engine='xlsxwriter') as wr: res.to_excel(wr, index=False)
     st.download_button("📥 DESCARGAR EXCEL", buf.getvalue(), f"{sel}.xlsx")
+
 
 
 

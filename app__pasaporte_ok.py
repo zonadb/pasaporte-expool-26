@@ -12,63 +12,48 @@ st.set_page_config(
     page_icon="logo_mzb.jpg"
 )
 
-# --- 2. TÍTULO XL ESTILO UNIVERSAL CON ILUMINACIÓN POSTERIOR ---
-st.markdown(f"""
+# --- 2. TÍTULO ESTILO UNIVERSAL (VERSIÓN ORIGINAL RECUPERADA) ---
+st.markdown("""
     <style>
-    /* Animación del Título con Brillo Expandido */
-    @keyframes neon-glow {{
-        0% {{ text-shadow: 0 0 15px #FF8C00, 0 0 30px #FF8C00, 0 0 45px #FF4500; }}
-        50% {{ text-shadow: 0 0 25px #FF8C00, 0 0 50px #FF8C00, 0 0 70px #FF4500; }}
-        100% {{ text-shadow: 0 0 15px #FF8C00, 0 0 30px #FF8C00, 0 0 45px #FF4500; }}
-    }}
-    
-    .titulo-universal-xl {{
-        color: white; 
-        font-family: 'Arial Black', Gadget, sans-serif;
-        font-size: 5.5rem; /* TAMAÑO GIGANTE */
-        font-weight: 900; 
-        text-transform: uppercase;
-        text-align: center; 
-        margin-top: 5px; 
-        margin-bottom: 0px;
-        line-height: 0.9; /* Pegamos un poco las letras para estilo cine */
-        letter-spacing: -2px; /* Un toque más compacto para que quepa bien */
+    @keyframes neon-glow {
+        0% { text-shadow: 0 0 10px #FF8C00, 0 0 20px #FF8C00, 0 0 30px #FF4500; }
+        50% { text-shadow: 0 0 15px #FF8C00, 0 0 30px #FF8C00, 0 0 45px #FF4500; }
+        100% { text-shadow: 0 0 10px #FF8C00, 0 0 20px #FF8C00, 0 0 30px #FF4500; }
+    }
+    .titulo-universal {
+        color: white !important;
+        font-family: 'Arial Black', sans-serif !important;
+        font-size: 3.8rem !important; /* Tamaño original que quedaba bien */
+        font-weight: 900 !important;
+        text-transform: uppercase !important;
+        text-align: center !important;
+        margin-top: 20px !important;
+        margin-bottom: 0px !important;
+        letter-spacing: 4px !important;
         animation: neon-glow 3s infinite;
-        -webkit-text-stroke: 1px rgba(255, 255, 255, 0.1); /* Perfilado sutil */
-    }}
-
-    .subtitulo-mzb {{
-        color: #FF8C00;
-        font-size: 1.4rem;
-        font-weight: bold;
-        text-transform: uppercase;
-        text-align: center;
-        letter-spacing: 15px; /* Súper espaciado bajo el título grande */
-        margin-top: -10px;
-        margin-bottom: 30px;
+    }
+    .subtitulo-universal {
+        color: #FF8C00 !important;
+        font-size: 1.2rem !important;
+        font-weight: bold !important;
+        text-transform: uppercase !important;
+        text-align: center !important;
+        letter-spacing: 12px !important;
+        margin-bottom: 30px !important;
         opacity: 0.9;
-        text-shadow: 0 0 10px rgba(255, 140, 0, 0.5);
-    }}
-
-    /* Ajuste para que en móviles no se corte el título XL */
-    @media (max-width: 768px) {{
-        .titulo-universal-xl {{
-            font-size: 3.2rem; /* Tamaño optimizado para pantalla vertical */
-            letter-spacing: 1px;
-        }}
-        .subtitulo-mzb {{
-            font-size: 0.9rem;
-            letter-spacing: 5px;
-        }}
-    }}
+    }
+    /* Ajuste para móvil para que no se vea gigante */
+    @media (max-width: 768px) {
+        .titulo-universal { font-size: 2.5rem !important; letter-spacing: 2px !important; }
+        .subtitulo-universal { font-size: 0.9rem !important; letter-spacing: 6px !important; }
+    }
     </style>
     
     <div>
-        <h1 class="titulo-universal-xl">EXPOOL 2026</h1>
-        <p class="subtitulo-mzb">PASAPORTE MZB</p>
+        <h1 class="titulo-universal">EXPOOL 2026</h1>
+        <p class="subtitulo-universal">PASAPORTE MZB</p>
     </div>
     """, unsafe_allow_html=True)
-
 # --- CONTINÚA AQUÍ CON TU CABECERA DE IMÁGENES Y CONTADOR ---
 # --- CONTADOR XL CORREGIDO (HORA EXACTA ESPAÑA) ---
 from datetime import datetime
@@ -359,6 +344,7 @@ else: # MZB o Proveedor
     buf = io.BytesIO()
     with pd.ExcelWriter(buf, engine='xlsxwriter') as wr: res.to_excel(wr, index=False)
     st.download_button("📥 DESCARGAR EXCEL", buf.getvalue(), f"{sel}.xlsx")
+
 
 
 

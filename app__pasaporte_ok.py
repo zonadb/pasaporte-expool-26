@@ -275,8 +275,8 @@ def obtener_estado_actual(nombre, es_mzb):
 # --- SIDEBAR ---
 with st.sidebar:
     if os.path.exists("logo_mzb.jpg"): st.image("logo_mzb.jpg", use_container_width=True)
-    vista = st.radio("🔍 MENÚ:", ["AGENDA GENERAL", "MZB", "Proveedor / Stand", "🏛️ ", "🗺️ PLANO FERIA", "🎉 MENÚS Y OCIO", "🆘 AYUDA ZB"])
-    if vista not in ["🏛️ ", "🗺️ PLANO FERIA", "🎉 MENÚS Y OCIO", "🆘 AYUDA ZB"]:
+    vista = st.radio("🔍 MENÚ:", ["AGENDA GENERAL", "MZB", "Proveedor / Stand", "🏛️ ASAMBLEA", "🗺️ PLANO FERIA", "🎉 MENÚS Y OCIO", "🆘 AYUDA ZB"])
+    if vista not in ["🏛️ ASAMBLEA", "🗺️ PLANO FERIA", "🎉 MENÚS Y OCIO", "🆘 AYUDA ZB"]:
         dia_sel = st.selectbox("📅 JORNADA:", ["Día 1 (3 Marzo)", "Día 2 (4 Marzo)"])
         sel = st.selectbox("👤 SELECCIONA NOMBRE:", mzb_listado if vista == "MZB" else prov_listado)
 
@@ -311,9 +311,6 @@ elif vista == "🎉 MENÚS Y OCIO":
     st.link_button("📲 AVISAR ALERGIAS", "https://wa.me/34670379925?text=Tengo%20una%20alergia...")
 
 elif vista == "🏛️ ASAMBLEA":
-    # --- EVITAR ERROR NameError ---
-    sel = mzb_listado[0] # Valor por defecto para que no falle el resto del código
-    
     st.markdown('<div class="socio-card"><h1 style="margin:0; font-size: 32px;">🏛️ ASAMBLEA GENERAL</h1><p style="margin:0; color: white; font-size: 18px;">ACCESO RESTRINGIDO A SOCIOS</p></div>', unsafe_allow_html=True)
     
     # Sistema de protección
@@ -352,23 +349,11 @@ elif vista == "🏛️ ASAMBLEA":
                     <li><b style="color: #FF8C00;">9.</b> NUEVO CATÁLOGO ZB 2026-27.</li>
                     <li><b style="color: #FF8C00;">10.</b> Ruegos y Preguntas.</li>
                 </ul></div>""", unsafe_allow_html=True)
-
-        st.markdown("<br>", unsafe_allow_html=True)
-        try:
-            with open("entrevistas_zb.docx", "rb") as file:
-                st.download_button(
-                    label="📄 DESCARGAR ENTREVISTAS ZB",
-                    data=file,
-                    file_name="entrevistas_zb.docx",
-                    mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-                )
-        except FileNotFoundError:
-            st.info("ℹ️ El archivo de entrevistas estará disponible próximamente.")
-
     elif password == "":
         st.warning("Por favor, introduce la clave para continuar.")
     else:
         st.error("❌ Clave incorrecta.")
+
 elif vista == "AGENDA GENERAL":
     df = generar_datos_feria(dia_sel)
     for _, fila in df.iterrows():
@@ -392,21 +377,6 @@ else: # MZB o Proveedor
     buf = io.BytesIO()
     with pd.ExcelWriter(buf, engine='xlsxwriter') as wr: res.to_excel(wr, index=False)
     st.download_button("📥 DESCARGAR EXCEL", buf.getvalue(), f"{sel}.xlsx")
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

@@ -190,33 +190,65 @@ prov_listado = [
 def generar_datos_feria(dia):
     es_d1 = (dia == "Día 1 (3 Marzo)")
     filas = []
-    t_count = 0
+    
+    # IMPORTANTE: t_global es la "llave" para que no se repitan
     if es_d1:
+        t_global = 0 # El primer día empezamos de cero
+        
+        # --- MAÑANA DÍA 1 (09:00 a 13:00 = 12 rotaciones) ---
         curr = datetime.strptime("09:00", "%H:%M")
         while curr < datetime.strptime("13:00", "%H:%M"):
             f = {"Hora": curr.strftime("%H:%M"), "TIPO": "ROTACION"}
-            for i, s in enumerate(mzb_listado): f[s] = prov_listado[(i + t_count) % len(prov_listado)]
-            filas.append(f); curr += timedelta(minutes=20); t_count += 1
+            for i, s in enumerate(mzb_listado):
+                # La magia: (posición socio + rotación actual) % total marcas
+                f[s] = prov_listado[(i + t_global) % len(prov_listado)]
+            filas.append(f)
+            curr += timedelta(minutes=20)
+            t_global += 1
+            
+        # EVENTO FIJO
         filas.append({"Hora": "13:00", "TIPO": "EVENTO", **{s: "🏁 INAUGURACIÓN" for s in mzb_listado}})
+        
+        # --- TARDE DÍA 1 (15:00 a 19:00 = 12 rotaciones) ---
         curr = datetime.strptime("15:00", "%H:%M")
         while curr < datetime.strptime("19:00", "%H:%M"):
             f = {"Hora": curr.strftime("%H:%M"), "TIPO": "ROTACION"}
-            for i, s in enumerate(mzb_listado): f[s] = prov_listado[(i + t_count) % len(prov_listado)]
-            filas.append(f); curr += timedelta(minutes=20); t_count += 1
-    else:
+            for i, s in enumerate(mzb_listado):
+                f[s] = prov_listado[(i + t_global) % len(prov_listado)]
+            filas.append(f)
+            curr += timedelta(minutes=20)
+            t_global += 1
+            
+    else: # DÍA 2
+        # Empezamos en la 24 porque el Día 1 ya "gastó" 24 turnos
+        t_global = 24 
+        
+        # --- MAÑANA DÍA 2 (09:30 a 14:00 = 13 rotaciones aprox) ---
         curr = datetime.strptime("09:30", "%H:%M")
-        t_count = 15
         while curr < datetime.strptime("14:00", "%H:%M"):
             f = {"Hora": curr.strftime("%H:%M"), "TIPO": "ROTACION"}
-            for i, s in enumerate(mzb_listado): f[s] = prov_listado[(i + t_count) % len(prov_listado)]
-            filas.append(f); curr += timedelta(minutes=20); t_count += 1
+            for i, s in enumerate(mzb_listado):
+                f[s] = prov_listado[(i + t_global) % len(prov_listado)]
+            filas.append(f)
+            curr += timedelta(minutes=20)
+            t_global += 1
+            
+        # EVENTO FIJO
         filas.append({"Hora": "14:00", "TIPO": "EVENTO", **{s: "🍽️ COMIDA GRUPAL" for s in mzb_listado}})
+        
+        # --- TARDE DÍA 2 (16:00 a 17:00 = 3 rotaciones) ---
         curr = datetime.strptime("16:00", "%H:%M")
         while curr < datetime.strptime("17:00", "%H:%M"):
             f = {"Hora": curr.strftime("%H:%M"), "TIPO": "ROTACION"}
-            for i, s in enumerate(mzb_listado): f[s] = prov_listado[(i + t_count) % len(prov_listado)]
-            filas.append(f); curr += timedelta(minutes=20); t_count += 1
+            for i, s in enumerate(mzb_listado):
+                f[s] = prov_listado[(i + t_global) % len(prov_listado)]
+            filas.append(f)
+            curr += timedelta(minutes=20)
+            t_global += 1
+            
+        # EVENTO FINAL
         filas.append({"Hora": "17:00", "TIPO": "EVENTO", **{s: "🎰 SORTEO PROVEEDORES" for s in mzb_listado}})
+        
     return pd.DataFrame(filas)
 
 # --- LÓGICA DE TIEMPO REAL (ZONA MADRID) ---
@@ -345,6 +377,7 @@ else: # MZB o Proveedor
     buf = io.BytesIO()
     with pd.ExcelWriter(buf, engine='xlsxwriter') as wr: res.to_excel(wr, index=False)
     st.download_button("📥 DESCARGAR EXCEL", buf.getvalue(), f"{sel}.xlsx")
+
 
 
 

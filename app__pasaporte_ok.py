@@ -289,6 +289,21 @@ elif vista == "🏛️ ASAMBLEA":
         st.markdown('<div style="background-color: #111; padding: 15px; border-radius: 10px; border: 1px solid #FF8C00; color: #FF8C00; font-size: 20px; text-align: center; font-weight: bold;">📍 UBICACIÓN: Edificio Multiusos de Amposta</div>', unsafe_allow_html=True)
         
         st.markdown("<br>", unsafe_allow_html=True)
+        # --- BLOQUE DE DESCARGA DE ASAMBLEA ---
+        st.subheader("📂 Documentación Oficial")
+        
+        try:
+            with open("entrevistas_zb.docx", "rb") as file:
+                st.download_button(
+                    label="📄 DESCARGAR ENTREVISTAS ZB",
+                    data=file,
+                    file_name="entrevistas_zb.docx",
+                    mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                )
+        except FileNotFoundError:
+            st.error("⚠️ El archivo 'entrevistas_zb.docx' aún no ha sido subido a GitHub.")
+
+        st.markdown("<br>", unsafe_allow_html=True)
         
         c1, c2 = st.columns(2)
         with c1:
@@ -345,6 +360,7 @@ else: # MZB o Proveedor
     buf = io.BytesIO()
     with pd.ExcelWriter(buf, engine='xlsxwriter') as wr: res.to_excel(wr, index=False)
     st.download_button("📥 DESCARGAR EXCEL", buf.getvalue(), f"{sel}.xlsx")
+
 
 
 

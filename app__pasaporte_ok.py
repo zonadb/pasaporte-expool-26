@@ -175,7 +175,7 @@ mzb_listado = [
     "NEW CHEM", "AQUASERVEIS", "AQUASERVEIS REUS", "PISCIBLUE", "PISCINAS DE LA FLOR",
     "PISCINAS JESUS", "INSTALACIONES PISCINAS JESUS", "PISCINAS LOS BALCONES S.L.U.", "PISCINAS PILIO",
     "PISCINES CENTER", "PISCINES GELMI", "PISCINES PIERA", "PISCISALUD", "POOLMARK",
-    "SHOP LINER POOL", "SILLERO E HIJOS SL", "TECNODRY"
+    "SHOP LINER POOL", "TECNODRY", "SILLERO E HIJOS SL", "REGALO ZB", "OCIO"
 ]
 
 prov_listado = [
@@ -387,6 +387,7 @@ else: # MZB o Proveedor
     buf = io.BytesIO()
     with pd.ExcelWriter(buf, engine='xlsxwriter') as wr: res.to_excel(wr, index=False)
     st.download_button("📥 DESCARGAR EXCEL", buf.getvalue(), f"{sel}.xlsx")
+
 
 
 

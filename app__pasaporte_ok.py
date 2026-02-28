@@ -94,32 +94,7 @@ st.markdown(f"""
         <h1 class="titulo-universal">EXPOOL 2026</h1>
         <p style="color: #FF8C00; text-align: center; letter-spacing: 10px; font-weight: bold; margin-bottom: 20px;">PASAPORTE MZB</p>
     </div>
-    /* --- SUPER FORZADO DE BLANCO (MODO LECTURA TOTAL) --- */
-    
-    /* 1. Forzamos párrafos, divisiones y spans */
-    .stMarkdown div, .stMarkdown p, .stMarkdown span, .stText {
-        color: #FFFFFF !important;
-        font-size: 1.1rem !important; /* Un pelín más grande para la agenda */
-    }
-
-    /* 2. Forzamos etiquetas de texto secundario (las más rebeldes) */
-    p, span, label, .st-ae, .st-af {
-        color: #FFFFFF !important;
-    }
-
-    /* 3. Las Horas o Títulos de Agenda en Naranja Neón */
-    h1, h2, h3 {
-        color: #FF8C00 !important;
-        text-shadow: 0 0 5px rgba(255, 140, 0, 0.3) !important;
-    }
-
-    /* 4. Si usas listas con puntitos (bullet points) */
-    li {
-        color: white !important;
-        margin-bottom: 10px;
-    }
-    
-    </style>
+  
     """, unsafe_allow_html=True)
 # --- CONTINÚA AQUÍ CON TU CABECERA DE IMÁGENES Y CONTADOR ---
 # --- CONTADOR XL CORREGIDO (HORA EXACTA ESPAÑA) ---
@@ -422,6 +397,7 @@ else: # MZB o Proveedor
     buf = io.BytesIO()
     with pd.ExcelWriter(buf, engine='xlsxwriter') as wr: res.to_excel(wr, index=False)
     st.download_button("📥 DESCARGAR EXCEL", buf.getvalue(), f"{sel}.xlsx")
+
 
 
 

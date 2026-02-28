@@ -7,9 +7,9 @@ import pytz
 
 # 1. CONFIGURACIÓN DE PÁGINA (Sintaxis corregida)
 st.set_page_config(
-    page_title="EXPOOL 2026",
-    page_icon="logo_mzb.jpg",  # <--- AQUÍ va tu logo
-    layout="wide"
+    page_title="EXPOOL 2026 - Pasaporte MZB", 
+    layout="wide", 
+    page_icon="logo_mzb.jpg"
 )
 
 # --- 2. TÍTULO ESTILO UNIVERSAL (VERSIÓN ORIGINAL RECUPERADA) ---
@@ -166,12 +166,8 @@ def bienvenida():
 if 'visto' not in st.session_state:
     bienvenida()
 
-import streamlit as st
-import pandas as pd
-from datetime import datetime, timedelta
-
-# --- LISTADOS OFICIALES ---
-socios = [
+# --- LISTADOS ---
+mzb_listado = [
     "AIGUANET GARDEN AND POOL", "AISLANTES AISLAMAX", "AIT", "AZ PISCINAS", "CIPAGUA",
     "OCIO JARDIN CARRETERO S.L.", "AQUAINDESA", "CALDARIUM", "CONSAN PISCINAS", "COSTA PISCINAS",
     "GRIFONSUR", "GUADALOPE PISCINAS", "HERMONT", "HIDRAULICA AGUA CLARA", "IPOOL CENTER",
@@ -182,7 +178,7 @@ socios = [
     "SHOP LINER POOL", "SILLERO E HIJOS SL", "TECNODRY"
 ]
 
-marcas = [
+prov_listado = [
     "KITPOOL", "BAEZA S.A.", "SINED", "G4PRO", "POOLSTAR", "BSLIGHT SL", "IBERCOVERPOOL",
     "INSOL - PWG", "HAYWARD", "GCL ELECT.", "DOSIM", "SPECK", "SCP POOL", "CUPOSOL S.L.",
     "VIDREPUR", "BEHQ", "POOLTIGER", "SPACE POOLS", "HAOGENPLAST", "ETATRON",
@@ -191,62 +187,38 @@ marcas = [
     "PRODUCTOS QP", "RENOLIT", "SAS", "BSPOOL", "PS GROUP", "MAYTRONICS"
 ]
 
-def generar_datos_feria_blindado(dia_seleccionado):
-    es_d1 = (dia_seleccionado == "Día 1 (3 Marzo)")
+def generar_datos_feria(dia):
+    es_d1 = (dia == "Día 1 (3 Marzo)")
     filas = []
-    
-    # Definimos los bloques según tu esquema
+    t_count = 0
     if es_d1:
-        bloques = [("09:00", "13:00", "ROTACION"), ("13:00", "13:30", "🏁 INAUGURACIÓN"), ("15:00", "19:00", "ROTACION")]
-        t_start = 0 # El día 1 empieza desde la primera marca
+        curr = datetime.strptime("09:00", "%H:%M")
+        while curr < datetime.strptime("13:00", "%H:%M"):
+            f = {"Hora": curr.strftime("%H:%M"), "TIPO": "ROTACION"}
+            for i, s in enumerate(mzb_listado): f[s] = prov_listado[(i + t_count) % len(prov_listado)]
+            filas.append(f); curr += timedelta(minutes=20); t_count += 1
+        filas.append({"Hora": "13:00", "TIPO": "EVENTO", **{s: "🏁 INAUGURACIÓN" for s in mzb_listado}})
+        curr = datetime.strptime("15:00", "%H:%M")
+        while curr < datetime.strptime("19:00", "%H:%M"):
+            f = {"Hora": curr.strftime("%H:%M"), "TIPO": "ROTACION"}
+            for i, s in enumerate(mzb_listado): f[s] = prov_listado[(i + t_count) % len(prov_listado)]
+            filas.append(f); curr += timedelta(minutes=20); t_count += 1
     else:
-        bloques = [("09:30", "14:00", "ROTACION"), ("14:00", "15:30", "🍽️ COMIDA GRUPAL"), ("16:00", "17:00", "ROTACION"), ("17:00", "18:00", "🎰 SORTEO")]
-        t_start = 24 # El día 2 continúa donde lo dejó el día 1 (ajusta este número si el día 1 tiene más/menos rotaciones)
-
-    t_count = t_start
-    num_marcas = len(marcas)
-    
-    for inicio, fin, tipo in bloques:
-        curr = datetime.strptime(inicio, "%H:%M")
-        tope = datetime.strptime(fin, "%H:%M")
-        
-        if tipo == "ROTACION":
-            while curr < tope:
-                f = {"Hora": curr.strftime("%H:%M"), "TIPO": "ROTACION"}
-                for i, socio in enumerate(socios):
-                    idx_marca = i + t_count
-                    # CLAVE: Si el índice supera el número de marcas, DESCANSO
-                    if idx_marca < num_marcas:
-                        f[socio] = marcas[idx_marca]
-                    else:
-                        f[socio] = "☕ DESCANSO / NETWORKING"
-                
-                filas.append(f)
-                curr += timedelta(minutes=20)
-                t_count += 1
-        else:
-            f = {"Hora": inicio, "TIPO": "EVENTO", "DETALLE": tipo}
-            for s in socios: f[s] = tipo
-            filas.append(f)
-            
+        curr = datetime.strptime("09:30", "%H:%M")
+        t_count = 15
+        while curr < datetime.strptime("14:00", "%H:%M"):
+            f = {"Hora": curr.strftime("%H:%M"), "TIPO": "ROTACION"}
+            for i, s in enumerate(mzb_listado): f[s] = prov_listado[(i + t_count) % len(prov_listado)]
+            filas.append(f); curr += timedelta(minutes=20); t_count += 1
+        filas.append({"Hora": "14:00", "TIPO": "EVENTO", **{s: "🍽️ COMIDA GRUPAL" for s in mzb_listado}})
+        curr = datetime.strptime("16:00", "%H:%M")
+        while curr < datetime.strptime("17:00", "%H:%M"):
+            f = {"Hora": curr.strftime("%H:%M"), "TIPO": "ROTACION"}
+            for i, s in enumerate(mzb_listado): f[s] = prov_listado[(i + t_count) % len(prov_listado)]
+            filas.append(f); curr += timedelta(minutes=20); t_count += 1
+        filas.append({"Hora": "17:00", "TIPO": "EVENTO", **{s: "🎰 SORTEO PROVEEDORES" for s in mzb_listado}})
     return pd.DataFrame(filas)
 
-# --- VISUALIZACIÓN ---
-st.markdown("<h2 style='text-align: center; color: #FF8C00;'>PASAPORTE EXPOOL 2026</h2>", unsafe_allow_html=True)
-dia = st.radio("Jornada:", ["Día 1 (3 Marzo)", "Día 2 (4 Marzo)"], horizontal=True)
-df = generar_datos_feria_blindado(dia)
-
-for _, row in df.iterrows():
-    if row['TIPO'] == "ROTACION":
-        with st.expander(f"⏰ {row['Hora']} - BLOQUE ROTATIVO"):
-            for s in socios:
-                c1, c2 = st.columns([1, 1])
-                c1.write(f"**{s}**")
-                color = "#FF8C00" if "DESCANSO" not in row[s] else "#666"
-                c2.markdown(f"<div style='text-align:right; color:{color}; font-weight:bold;'>{row[s]}</div>", unsafe_allow_html=True)
-                st.markdown("<hr style='margin:2px; border:0.1px solid #333'>", unsafe_allow_html=True)
-    else:
-        st.markdown(f"<div style='background-color:#FF8C00; color:black; padding:10px; border-radius:8px; text-align:center; font-weight:bold; margin:10px 0;'>{row['Hora']} - {row['DETALLE']}</div>", unsafe_allow_html=True)
 # --- LÓGICA DE TIEMPO REAL (ZONA MADRID) ---
 tz = pytz.timezone('Europe/Madrid')
 ahora = datetime.now(tz)
@@ -307,7 +279,7 @@ elif vista == "🎉 MENÚS Y OCIO":
     st.link_button("📲 AVISAR ALERGIAS", "https://wa.me/34670379925?text=Tengo%20una%20alergia...")
 
 elif vista == "🏛️ ASAMBLEA":
-    st.markdown('<div class="socio-card"><h1 style="margin:0; font-size: 32px;">🏛️ ASAMBLEA GENERAL</h1><p style="margin:0; color: white; font-size: 18px;">ACCESO RESTRINGIDO A MZB</p></div>', unsafe_allow_html=True)
+    st.markdown('<div class="socio-card"><h1 style="margin:0; font-size: 32px;">🏛️ ASAMBLEA GENERAL</h1><p style="margin:0; color: white; font-size: 18px;">ACCESO RESTRINGIDO A SOCIOS</p></div>', unsafe_allow_html=True)
     
     # Sistema de protección
     password = st.text_input("Introduce la clave de Socio para ver el orden del día:", type="password")
@@ -316,21 +288,6 @@ elif vista == "🏛️ ASAMBLEA":
         st.success("✅ Acceso concedido")
         st.markdown('<div style="background-color: #111; padding: 15px; border-radius: 10px; border: 1px solid #FF8C00; color: #FF8C00; font-size: 20px; text-align: center; font-weight: bold;">📍 UBICACIÓN: Edificio Multiusos de Amposta</div>', unsafe_allow_html=True)
         
-        st.markdown("<br>", unsafe_allow_html=True)
-        # --- BLOQUE DE DESCARGA DE ASAMBLEA ---
-        st.subheader("📂 Documentación Oficial")
-        
-        try:
-            with open("entrevistas_zb.docx", "rb") as file:
-                st.download_button(
-                    label="📄 DESCARGAR ENTREVISTAS ZB",
-                    data=file,
-                    file_name="entrevistas_zb.docx",
-                    mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-                )
-        except FileNotFoundError:
-            st.error("⚠️ El archivo 'entrevistas_zb.docx' aún no ha sido subido a GitHub.")
-
         st.markdown("<br>", unsafe_allow_html=True)
         
         c1, c2 = st.columns(2)
@@ -364,7 +321,7 @@ elif vista == "🏛️ ASAMBLEA":
         st.warning("Por favor, introduce la clave para continuar.")
     else:
         st.error("❌ Clave incorrecta.")
-        
+
 elif vista == "AGENDA GENERAL":
     df = generar_datos_feria(dia_sel)
     for _, fila in df.iterrows():
@@ -388,6 +345,14 @@ else: # MZB o Proveedor
     buf = io.BytesIO()
     with pd.ExcelWriter(buf, engine='xlsxwriter') as wr: res.to_excel(wr, index=False)
     st.download_button("📥 DESCARGAR EXCEL", buf.getvalue(), f"{sel}.xlsx")
+
+
+
+
+
+
+
+
 
 
 

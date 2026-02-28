@@ -236,7 +236,7 @@ def generar_datos_feria(dia):
             t_global += 1
             
         # EVENTO FIJO
-        filas.append({"Hora": "14:00", "TIPO": "EVENTO", **{s: "🍽️ COMIDA" for s in mzb_listado}})
+        filas.append({"Hora": "14:00", "TIPO": "EVENTO", **{s: "🍽️ COMIDA - PROVEEDORES LIBRE / MZB ULLALS" for s in mzb_listado}})
         
         # --- TARDE DÍA 2 (16:00 a 17:00 = 3 rotaciones) ---
         curr = datetime.strptime("16:00", "%H:%M")
@@ -387,6 +387,7 @@ else: # MZB o Proveedor
     buf = io.BytesIO()
     with pd.ExcelWriter(buf, engine='xlsxwriter') as wr: res.to_excel(wr, index=False)
     st.download_button("📥 DESCARGAR EXCEL", buf.getvalue(), f"{sel}.xlsx")
+
 
 
 

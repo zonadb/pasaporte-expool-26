@@ -321,7 +321,20 @@ elif vista == "🏛️ ASAMBLEA":
         st.warning("Por favor, introduce la clave para continuar.")
     else:
         st.error("❌ Clave incorrecta.")
+        
+# --- SECCIÓN ASAMBLEA (ZONA PRIVADA) ---
+st.markdown("### 📂 Documentación Asamblea")
 
+# 1. Abrimos el archivo en modo lectura binaria
+with open("acta_asamblea.docx", "rb") as file:
+    btn = st.download_button(
+        label="📄 DESCARGAR ACTA ASAMBLEA",
+        data=file,
+        file_name="acta_asamblea.docx",
+        mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+    )
+
+st.write("Haz clic arriba para bajar el documento oficial en formato Word.")
 elif vista == "AGENDA GENERAL":
     df = generar_datos_feria(dia_sel)
     for _, fila in df.iterrows():
@@ -345,6 +358,7 @@ else: # MZB o Proveedor
     buf = io.BytesIO()
     with pd.ExcelWriter(buf, engine='xlsxwriter') as wr: res.to_excel(wr, index=False)
     st.download_button("📥 DESCARGAR EXCEL", buf.getvalue(), f"{sel}.xlsx")
+
 
 
 

@@ -54,6 +54,7 @@ st.markdown("""
         <p class="subtitulo-universal">PASAPORTE MZB</p>
     </div>
     """, unsafe_allow_html=True)
+
 # --- CONTINÚA AQUÍ CON TU CABECERA DE IMÁGENES Y CONTADOR ---
 # --- CONTADOR XL CORREGIDO (HORA EXACTA ESPAÑA) ---
 from datetime import datetime
@@ -344,6 +345,7 @@ else: # MZB o Proveedor
     buf = io.BytesIO()
     with pd.ExcelWriter(buf, engine='xlsxwriter') as wr: res.to_excel(wr, index=False)
     st.download_button("📥 DESCARGAR EXCEL", buf.getvalue(), f"{sel}.xlsx")
+
 
 
 

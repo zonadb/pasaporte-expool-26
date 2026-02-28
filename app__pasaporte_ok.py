@@ -188,6 +188,17 @@ st.markdown("""
         border-radius: 10px; border: 1px solid #FF4B4B; text-align: center;
     }
     </style>
+    /* ... (todos los estilos anteriores de botones, títulos, etc.) ... */
+
+    /* --- FINAL DEL BLOQUE DE ESTILOS --- */
+    .stMarkdown p, .stText, .stMarkdown span {
+        color: #FFFFFF !important;
+    }
+    h3 {
+        color: #FF8C00 !important;
+        font-weight: 800 !important;
+    }
+    </style>
     """, unsafe_allow_html=True)
 
 # --- MENSAJE DE BIENVENIDA (MODAL) ---
@@ -385,6 +396,7 @@ else: # MZB o Proveedor
     buf = io.BytesIO()
     with pd.ExcelWriter(buf, engine='xlsxwriter') as wr: res.to_excel(wr, index=False)
     st.download_button("📥 DESCARGAR EXCEL", buf.getvalue(), f"{sel}.xlsx")
+
 
 
 

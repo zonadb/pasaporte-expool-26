@@ -13,39 +13,38 @@ st.set_page_config(
 )
 
 # 2. TÍTULO ESTILO UNIVERSAL CON ILUMINACIÓN POSTERIOR
-st.markdown("""
-    # --- 2. ESTILOS Y EFECTOS WAU ---
-st.markdown("""
+# --- 2. ESTILOS Y EFECTOS WAU CORREGIDOS ---
+st.markdown(f"""
     <style>
     /* Fondo con degradado radial tipo cine */
-    .main { 
+    .main {{ 
         background: radial-gradient(circle, #1a1a1a 0%, #000000 100%) !important; 
-    }
-    [data-testid="stAppViewContainer"] { 
+    }}
+    [data-testid="stAppViewContainer"] {{ 
         background: radial-gradient(circle, #1a1a1a 0%, #000000 100%) !important; 
-    }
+    }}
 
     /* Animación del Título Universal */
-    @keyframes neon-glow {
-        0% { text-shadow: 0 0 10px #FF8C00, 0 0 20px #FF8C00; }
-        50% { text-shadow: 0 0 20px #FF8C00, 0 0 40px #FF4500; }
-        100% { text-shadow: 0 0 10px #FF8C00, 0 0 20px #FF8C00; }
-    }
-    .titulo-universal {
+    @keyframes neon-glow {{
+        0% {{ text-shadow: 0 0 10px #FF8C00, 0 0 20px #FF8C00; }}
+        50% {{ text-shadow: 0 0 20px #FF8C00, 0 0 40px #FF4500; }}
+        100% {{ text-shadow: 0 0 10px #FF8C00, 0 0 20px #FF8C00; }}
+    }}
+    .titulo-universal {{
         color: white; font-family: 'Arial Black', sans-serif;
         font-size: 3.2rem; font-weight: 900; text-transform: uppercase;
         text-align: center; margin-top: 10px; letter-spacing: 4px;
         animation: neon-glow 3s infinite;
-    }
+    }}
 
     /* --- EL EFECTO WAU: BARRIDO DE LUZ EN BOTONES --- */
-    @keyframes shine {
-        0% { left: -100%; }
-        20% { left: 100%; }
-        100% { left: 100%; }
-    }
+    @keyframes shine {{
+        0% {{ left: -100%; }}
+        20% {{ left: 100%; }}
+        100% {{ left: 100%; }}
+    }}
 
-    .stDownloadButton button, .stLinkButton a {
+    .stDownloadButton button, .stLinkButton a {{
         position: relative !important;
         overflow: hidden !important;
         background: linear-gradient(135deg, #FF8C00 0%, #FF4500 100%) !important;
@@ -56,10 +55,11 @@ st.markdown("""
         padding: 15px !important;
         transition: transform 0.2s ease !important;
         display: flex; justify-content: center;
-    }
+        text-decoration: none !important;
+    }}
 
     /* La capa de brillo que cruza el botón */
-    .stDownloadButton button::after, .stLinkButton a::after {
+    .stDownloadButton button::after, .stLinkButton a::after {{
         content: '';
         position: absolute;
         top: 0;
@@ -74,26 +74,26 @@ st.markdown("""
         );
         transform: skewX(-25deg);
         animation: shine 4s infinite;
-    }
+    }}
 
-    .stDownloadButton button:hover {
+    .stDownloadButton button:hover {{
         transform: scale(1.02);
         box-shadow: 0 0 15px rgba(255, 140, 0, 0.5);
-    }
+    }}
     
-    /* Estilo de las tablas para que no desentonen */
-    [data-testid="stTable"] { 
+    /* Estilo de las tablas */
+    [data-testid="stTable"] {{ 
         background-color: rgba(26, 26, 26, 0.8) !important; 
         border-radius: 15px; 
         border: 1px solid #333;
-    }
-    th { background-color: #FF8C00 !important; color: black !important; }
-    td { color: white !important; }
+    }}
+    th {{ background-color: #FF8C00 !important; color: black !important; }}
+    td {{ color: white !important; }}
     </style>
     
     <div>
         <h1 class="titulo-universal">EXPOOL 2026</h1>
-        <p style="color: #FF8C00; text-align: center; letter-spacing: 10px; font-weight: bold;">PASAPORTE MZB</p>
+        <p style="color: #FF8C00; text-align: center; letter-spacing: 10px; font-weight: bold; margin-bottom: 20px;">PASAPORTE MZB</p>
     </div>
     """, unsafe_allow_html=True)
 
@@ -387,6 +387,7 @@ else: # MZB o Proveedor
     buf = io.BytesIO()
     with pd.ExcelWriter(buf, engine='xlsxwriter') as wr: res.to_excel(wr, index=False)
     st.download_button("📥 DESCARGAR EXCEL", buf.getvalue(), f"{sel}.xlsx")
+
 
 
 

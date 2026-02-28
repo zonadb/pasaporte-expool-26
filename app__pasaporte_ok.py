@@ -311,6 +311,9 @@ elif vista == "🎉 MENÚS Y OCIO":
     st.link_button("📲 AVISAR ALERGIAS", "https://wa.me/34670379925?text=Tengo%20una%20alergia...")
 
 elif vista == "🏛️ ASAMBLEA":
+    # --- EVITAR ERROR NameError ---
+    sel = mzb_listado[0] # Valor por defecto para que no falle el resto del código
+    
     st.markdown('<div class="socio-card"><h1 style="margin:0; font-size: 32px;">🏛️ ASAMBLEA GENERAL</h1><p style="margin:0; color: white; font-size: 18px;">ACCESO RESTRINGIDO A SOCIOS</p></div>', unsafe_allow_html=True)
     
     # Sistema de protección
@@ -350,7 +353,6 @@ elif vista == "🏛️ ASAMBLEA":
                     <li><b style="color: #FF8C00;">10.</b> Ruegos y Preguntas.</li>
                 </ul></div>""", unsafe_allow_html=True)
 
-        # --- AQUÍ ESTÁ EL BOTÓN NUEVO ---
         st.markdown("<br>", unsafe_allow_html=True)
         try:
             with open("entrevistas_zb.docx", "rb") as file:
@@ -390,6 +392,7 @@ else: # MZB o Proveedor
     buf = io.BytesIO()
     with pd.ExcelWriter(buf, engine='xlsxwriter') as wr: res.to_excel(wr, index=False)
     st.download_button("📥 DESCARGAR EXCEL", buf.getvalue(), f"{sel}.xlsx")
+
 
 
 

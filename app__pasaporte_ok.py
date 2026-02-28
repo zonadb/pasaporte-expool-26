@@ -186,7 +186,9 @@ prov_listado = [
     "ZB", "VYP", "FLUIDRA", "HIDROTEN S.A.", "IASO S.L.", "BOMBES PSH", "BAYROL",
     "PRODUCTOS QP", "RENOLIT", "SAS", "BSPOOL", "PS GROUP", "MAYTRONICS"
 ]
-
+# --- SEGURIDAD ANTI-ERROR ---
+sel = mzb_listado[0]
+dia_sel = "Día 1 (3 Marzo)"
 def generar_datos_feria(dia):
     es_d1 = (dia == "Día 1 (3 Marzo)")
     filas = []
@@ -313,45 +315,53 @@ elif vista == "🎉 MENÚS Y OCIO":
 elif vista == "🏛️ ASAMBLEA":
     st.markdown('<div class="socio-card"><h1 style="margin:0; font-size: 32px;">🏛️ ASAMBLEA GENERAL</h1><p style="margin:0; color: white; font-size: 18px;">ACCESO RESTRINGIDO A SOCIOS</p></div>', unsafe_allow_html=True)
     
-    # Sistema de protección
-    password = st.text_input("Introduce la clave de Socio para ver el orden del día:", type="password")
+    password = st.text_input("Introduce la clave de Socio:", type="password", key="pass_final")
     
     if password == "ZB2026":
         st.success("✅ Acceso concedido")
         st.markdown('<div style="background-color: #111; padding: 15px; border-radius: 10px; border: 1px solid #FF8C00; color: #FF8C00; font-size: 20px; text-align: center; font-weight: bold;">📍 UBICACIÓN: Edificio Multiusos de Amposta</div>', unsafe_allow_html=True)
         
-        st.markdown("<br>", unsafe_allow_html=True)
-        
         c1, c2 = st.columns(2)
         with c1:
-            st.markdown("""<div class="asamblea-card" style="padding: 20px;">
-                <h2 style="color: #FF8C00; font-size: 28px; margin-bottom: 5px;">📅 SESIÓN 1</h2>
-                <p style="font-size: 20px; margin-bottom: 2px;"><b>Lunes 2 de Marzo</b></p>
-                <p style="color: #bbb; font-size: 16px;">15:30h (1ª conv.) | 16:00h (2ª conv.)</p>
-                <hr style="border-color: #444;">
-                <ul style="list-style-type: none; padding-left: 0; font-size: 18px; line-height: 1.8;">
-                    <li><b style="color: #FF8C00;">1.</b> Bienvenida Presidente y Consejo.</li>
-                    <li><b style="color: #FF8C00;">2.</b> ALTAS y BAJAS Grupo ZB 2026.</li>
-                    <li><b style="color: #FF8C00;">3.</b> Actividades FERIA EXPOOL 2026.</li>
-                    <li><b style="color: #FF8C00;">4.</b> COMPRAS a PROVEEDORES 2025.</li>
-                    <li><b style="color: #FF8C00;">5.</b> PROVEEDORES 2026 y ZB AQUANATUR.</li>
+            st.markdown("""<div class="asamblea-card">
+                <h2 style="color: #FF8C00;">📅 SESIÓN 1</h2>
+                <p><b>Lunes 2 de Marzo</b></p>
+                <hr>
+                <ul style="list-style-type: none; padding-left: 0;">
+                    <li>1. Bienvenida Presidente.</li>
+                    <li>2. ALTAS y BAJAS 2026.</li>
+                    <li>3. Actividades EXPOOL.</li>
+                    <li>4. COMPRAS 2025.</li>
+                    <li>5. PROVEEDORES 2026.</li>
                 </ul></div>""", unsafe_allow_html=True)
         with c2:
-            st.markdown("""<div class="asamblea-card" style="padding: 20px;">
-                <h2 style="color: #FF8C00; font-size: 28px; margin-bottom: 5px;">📅 SESIÓN 2</h2>
-                <p style="font-size: 20px; margin-bottom: 2px;"><b>Jueves 5 de Marzo</b></p>
-                <p style="color: #bbb; font-size: 16px;">09:30h (1ª conv.) | 10:00h (2ª conv.)</p>
-                <hr style="border-color: #444;">
-                <ul style="list-style-type: none; padding-left: 0; font-size: 18px; line-height: 1.8;">
-                    <li><b style="color: #FF8C00;">6.</b> FIGURA SOCIO Y RAPPEL 2025.</li>
-                    <li><b style="color: #FF8C00;">7.</b> PROGRAMA ZB PLATINUM 2026.</li>
-                    <li><b style="color: #FF8C00;">8.</b> MARKETING, WEB y RR.SS.</li>
-                    <li><b style="color: #FF8C00;">9.</b> NUEVO CATÁLOGO ZB 2026-27.</li>
-                    <li><b style="color: #FF8C00;">10.</b> Ruegos y Preguntas.</li>
+            st.markdown("""<div class="asamblea-card">
+                <h2 style="color: #FF8C00;">📅 SESIÓN 2</h2>
+                <p><b>Jueves 5 de Marzo</b></p>
+                <hr>
+                <ul style="list-style-type: none; padding-left: 0;">
+                    <li>6. FIGURA SOCIO Y RAPPEL.</li>
+                    <li>7. ZB PLATINUM 2026.</li>
+                    <li>8. MARKETING Y RR.SS.</li>
+                    <li>9. NUEVO CATÁLOGO ZB.</li>
+                    <li>10. Ruegos y Preguntas.</li>
                 </ul></div>""", unsafe_allow_html=True)
-    elif password == "":
-        st.warning("Por favor, introduce la clave para continuar.")
-    else:
+
+        # --- BOTÓN DE DESCARGA SEGURO ---
+        st.markdown("<br>", unsafe_allow_html=True)
+        if os.path.exists("entrevistas_zb.docx"):
+            with open("entrevistas_zb.docx", "rb") as f:
+                st.download_button(
+                    label="📄 DESCARGAR ENTREVISTAS ZB",
+                    data=f,
+                    file_name="entrevistas_zb.docx",
+                    mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                    key="download_asamblea_final"
+                )
+        else:
+            st.warning("⚠️ El archivo 'entrevistas_zb.docx' no se encuentra en el servidor.")
+
+    elif password != "":
         st.error("❌ Clave incorrecta.")
 
 elif vista == "AGENDA GENERAL":
@@ -377,6 +387,7 @@ else: # MZB o Proveedor
     buf = io.BytesIO()
     with pd.ExcelWriter(buf, engine='xlsxwriter') as wr: res.to_excel(wr, index=False)
     st.download_button("📥 DESCARGAR EXCEL", buf.getvalue(), f"{sel}.xlsx")
+
 
 
 

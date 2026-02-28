@@ -13,20 +13,48 @@ st.set_page_config(
 )
 
 # --- 2. ESTILOS Y EFECTOS WAU CORREGIDOS ---
-st.markdown(f"""
-  .stMarkdown div, .stMarkdown p, .stMarkdown span, .stText, p, span, li {
-        color: #FFFFFF !important;
-        font-size: 1.1rem !important;
-    }
+st.markdown("""
+<style>
+/* 1. FORZADO DE TEXTO BLANCO (AGENDA) */
+.stMarkdown div, .stMarkdown p, .stMarkdown span, .stText, p, span, li {
+    color: #FFFFFF !important;
+    font-size: 1.1rem !important;
+}
 
-    h1, h2, h3 {
-        color: #FF8C00 !important;
-        font-weight: bold !important;
-    }
+/* 2. HORAS Y TÍTULOS EN NARANJA */
+h1, h2, h3 {
+    color: #FF8C00 !important;
+    font-weight: bold !important;
+}
 
-    /* --- AQUÍ TERMINA EL BLOQUE --- */
-    </style>
-    """, unsafe_allow_html=True)
+/* 3. BOTONES CON BRILLO */
+@keyframes shine {
+    0% { left: -100%; }
+    20% { left: 100%; }
+    100% { left: 100%; }
+}
+.stDownloadButton button, .stLinkButton a {
+    position: relative !important;
+    overflow: hidden !important;
+    background: linear-gradient(135deg, #FF8C00 0%, #FF4500 100%) !important;
+    color: black !important;
+    border: none !important;
+    border-radius: 12px !important;
+}
+.stDownloadButton button::after, .stLinkButton a::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 60%;
+    height: 100%;
+    background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.5) 50%, rgba(255,255,255,0) 100%);
+    transform: skewX(-25deg);
+    animation: shine 4s infinite;
+}
+</style>
+""", unsafe_allow_html=True)
+# --- HASTA AQUÍ ---
     <style>
     /* Fondo con degradado radial tipo cine */
     .main {{ 
@@ -410,6 +438,7 @@ else: # MZB o Proveedor
     buf = io.BytesIO()
     with pd.ExcelWriter(buf, engine='xlsxwriter') as wr: res.to_excel(wr, index=False)
     st.download_button("📥 DESCARGAR EXCEL", buf.getvalue(), f"{sel}.xlsx")
+
 
 
 

@@ -5,13 +5,115 @@ import io
 import os
 import pytz
 
-# 1. CONFIGURACIÓN TOP (Logo en la pestaña)
+# 1. CONFIGURACIÓN DE PÁGINA (Sintaxis corregida)
 st.set_page_config(
     page_title="EXPOOL 2026 - Pasaporte MZB", 
     layout="wide", 
-    page_icon="logo_mzb.jpg" if os.path.exists("logo_mzb.jpg") else "💧"
+    page_icon="logo_mzb.jpg"
 )
 
+# --- 2. TÍTULO ESTILO UNIVERSAL (VERSIÓN ORIGINAL RECUPERADA) ---
+st.markdown("""
+    <style>
+    @keyframes neon-glow {
+        0% { text-shadow: 0 0 10px #FF8C00, 0 0 20px #FF8C00, 0 0 30px #FF4500; }
+        50% { text-shadow: 0 0 15px #FF8C00, 0 0 30px #FF8C00, 0 0 45px #FF4500; }
+        100% { text-shadow: 0 0 10px #FF8C00, 0 0 20px #FF8C00, 0 0 30px #FF4500; }
+    }
+    .titulo-universal {
+        color: white !important;
+        font-family: 'Arial Black', sans-serif !important;
+        font-size: 3.8rem !important; /* Tamaño original que quedaba bien */
+        font-weight: 900 !important;
+        text-transform: uppercase !important;
+        text-align: center !important;
+        margin-top: 20px !important;
+        margin-bottom: 0px !important;
+        letter-spacing: 4px !important;
+        animation: neon-glow 3s infinite;
+    }
+    .subtitulo-universal {
+        color: #FF8C00 !important;
+        font-size: 1.2rem !important;
+        font-weight: bold !important;
+        text-transform: uppercase !important;
+        text-align: center !important;
+        letter-spacing: 12px !important;
+        margin-bottom: 30px !important;
+        opacity: 0.9;
+    }
+    /* Ajuste para móvil para que no se vea gigante */
+    @media (max-width: 768px) {
+        .titulo-universal { font-size: 2.5rem !important; letter-spacing: 2px !important; }
+        .subtitulo-universal { font-size: 0.9rem !important; letter-spacing: 6px !important; }
+    }
+    </style>
+    
+    <div>
+        <h1 class="titulo-universal">EXPOOL 2026</h1>
+        <p class="subtitulo-universal">PASAPORTE MZB</p>
+    </div>
+    """, unsafe_allow_html=True)
+
+# --- CONTINÚA AQUÍ CON TU CABECERA DE IMÁGENES Y CONTADOR ---
+# --- CONTADOR XL CORREGIDO (HORA EXACTA ESPAÑA) ---
+from datetime import datetime
+import pytz
+
+# 1. Forzamos la zona horaria de Madrid
+tz_madrid = pytz.timezone('Europe/Madrid')
+
+# 2. Creamos la meta y la hora actual con la MISMA zona horaria de forma explícita
+meta_sorteo = tz_madrid.localize(datetime(2026, 3, 4, 17, 0, 0))
+ahora_ct = datetime.now(tz_madrid)
+
+# 3. Cálculo de la diferencia
+diferencia = meta_sorteo - ahora_ct
+
+if diferencia.total_seconds() > 0:
+    dias = diferencia.days
+    horas, rem = divmod(diferencia.seconds, 3600)
+    minutos, _ = divmod(rem, 60)
+    
+    # Lógica de colores (Naranja -> Rojo si faltan < 2 horas)
+    es_urgente = diferencia.total_seconds() < 7200
+    color_principal = "#FF0000" if es_urgente else "#FF8C00"
+    sombra_glow = "0px 0px 20px rgba(255, 0, 0, 0.6)" if es_urgente else "0px 0px 15px rgba(255, 140, 0, 0.4)"
+
+    st.markdown(f"""
+        <div style="
+            background: #0a0a0a; 
+            border: 3px solid {color_principal}; 
+            border-radius: 20px; 
+            padding: 30px; 
+            text-align: center; 
+            margin: 20px 0;
+            box-shadow: {sombra_glow};
+        ">
+            <p style="color: {color_principal}; font-size: 18px; font-weight: 900; letter-spacing: 3px; margin-bottom: 15px;">
+                {'🚨 ¡SORTEO INMINENTE! 🚨' if es_urgente else '⏳ CUENTA ATRÁS PARA EL GRAN SORTEO'}
+            </p>
+            <div style="display: flex; justify-content: center; align-items: center; gap: 25px;">
+                <div style="text-align: center;">
+                    <div style="color: white; font-size: 55px; font-weight: 900; line-height: 1;">{dias}</div>
+                    <div style="color: {color_principal}; font-size: 12px; font-weight: bold; text-transform: uppercase;">Días</div>
+                </div>
+                <div style="color: #444; font-size: 40px; font-weight: 100;">|</div>
+                <div style="text-align: center;">
+                    <div style="color: white; font-size: 55px; font-weight: 900; line-height: 1;">{horas:02d}</div>
+                    <div style="color: {color_principal}; font-size: 12px; font-weight: bold; text-transform: uppercase;">Hrs</div>
+                </div>
+                <div style="color: #444; font-size: 40px; font-weight: 100;">|</div>
+                <div style="text-align: center;">
+                    <div style="color: white; font-size: 55px; font-weight: 900; line-height: 1;">{minutos:02d}</div>
+                    <div style="color: {color_principal}; font-size: 12px; font-weight: bold; text-transform: uppercase;">Min</div>
+                </div>
+            </div>
+            <p style="color: #666; font-size: 14px; margin-top: 15px; font-style: italic;">Miércoles 4 de Marzo - 17:00h</p>
+        </div>
+    """, unsafe_allow_html=True)
+else:
+    st.markdown('<div class="status-box">🎰 ¡SORTEO EN CURSO! 🎰</div>', unsafe_allow_html=True)
 # --- CSS ESTILO ULTRA TOP ---
 st.markdown("""
     <style>
@@ -48,23 +150,17 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-# --- MENSAJE DE BIENVENIDA DEFINITIVO (SIN LA PALABRA INSTALAR) ---
-@st.dialog("💧 BIENVENIDO A EXPOOL 2026")
+# --- MENSAJE DE BIENVENIDA (MODAL) ---
+# --- MENSAJE DE BIENVENIDA (MODAL CORREGIDO) ---
+@st.dialog("🤝 ¡JUNTOS SOMOS MAS FUERTES! - EXPOOL 2026")
 def bienvenida():
+    st.write("Para llevar tu agenda siempre a mano, añade esta App a tu móvil:")
     st.markdown("""
-    <div style="text-align: center;">
-        <p style="font-size: 18px;"><b>¡Tu Pasaporte MZB ya está listo!</b></p>
-        <p>Para llevar la agenda siempre a mano en tu móvil:</p>
-    </div>
-    """, unsafe_allow_html=True)
-    
-    st.markdown("""
-    1. Pulsa los **3 puntos** (Android) o el botón **Compartir** (iPhone).
-    2. Selecciona la opción **'Añadir a pantalla de inicio'**.
-    3. ¡Listo! Tendrás el icono de la App junto a tus otras aplicaciones.
+    1. Pulsa los **3 puntos** (en Android) o el botón **Compartir** (en iPhone).
+    2. Selecciona **'Añadir a pantalla de inicio'**.
+    3. ¡Listo! Ya tendrás el icono de EXPOOL con el resto de tus Apps.
     """)
-    
-    if st.button("CONFIGURAR MÁS TARDE", use_container_width=True):
+    if st.button("¡ENTENDIDO!"):
         st.session_state.visto = True
         st.rerun()
 if 'visto' not in st.session_state:
@@ -157,7 +253,6 @@ c1, c2, c3 = st.columns([1, 4, 1])
 with c1: 
     if os.path.exists("portada.jpg"): st.image("portada.jpg", use_container_width=True)
 with c2: 
-    st.markdown('<p class="titulo-principal">EXPOOL 2026<br>PASAPORTE MZB</p>', unsafe_allow_html=True)
     if os.path.exists("juntos.png"): st.image("juntos.png", use_container_width=True)
 with c3: 
     if os.path.exists("planing_mzb.jpg"): st.image("planing_mzb.jpg", use_container_width=True)
@@ -171,12 +266,20 @@ elif vista == "🗺️ PLANO FERIA":
     if os.path.exists("plano.jpg"): st.image("plano.jpg", use_container_width=True)
 
 elif vista == "🎉 MENÚS Y OCIO":
-    if os.path.exists("ocio.jpg"): st.image("ocio.jpg", use_container_width=True)
-    st.markdown('<div class="alergia-box">⚠️ Avisa de alergias a Claudia.</div>', unsafe_allow_html=True)
+    if os.path.exists("ocio.jpg"): 
+        st.image("ocio.jpg", use_container_width=True)
+    
+    # He añadido estilo directamente en el div para forzar el tamaño
+    st.markdown("""
+        <div class="alergia-box" style="font-size: 40px !important; font-weight: 900; line-height: 1.2; padding: 25px;">
+            ⚠️ AVISA DE ALERGIAS A CLAUDIA
+        </div>
+        """, unsafe_allow_html=True)
+    
     st.link_button("📲 AVISAR ALERGIAS", "https://wa.me/34670379925?text=Tengo%20una%20alergia...")
 
 elif vista == "🏛️ ASAMBLEA":
-    st.markdown('<div class="socio-card"><h1 style="margin:0; font-size: 32px;">🏛️ ASAMBLEA GENERAL</h1><p style="margin:0; color: white; font-size: 18px;">ACCESO RESTRINGIDO A SOCIOS</p></div>', unsafe_allow_html=True)
+    st.markdown('<div class="socio-card"><h1 style="margin:0; font-size: 32px;">🏛️ ASAMBLEA GENERAL</h1><p style="margin:0; color: white; font-size: 18px;">ACCESO RESTRINGIDO A MZB</p></div>', unsafe_allow_html=True)
     
     # Sistema de protección
     password = st.text_input("Introduce la clave de Socio para ver el orden del día:", type="password")
@@ -242,5 +345,14 @@ else: # MZB o Proveedor
     buf = io.BytesIO()
     with pd.ExcelWriter(buf, engine='xlsxwriter') as wr: res.to_excel(wr, index=False)
     st.download_button("📥 DESCARGAR EXCEL", buf.getvalue(), f"{sel}.xlsx")
+
+
+
+
+
+
+
+
+
 
 

@@ -55,7 +55,7 @@ h1, h2, h3 {
 </style>
 """, unsafe_allow_html=True)
 # --- HASTA AQUÍ ---
-    <style>
+<style>
     /* Fondo con degradado radial tipo cine */
     .main {{ 
         background: radial-gradient(circle, #1a1a1a 0%, #000000 100%) !important; 
@@ -438,6 +438,7 @@ else: # MZB o Proveedor
     buf = io.BytesIO()
     with pd.ExcelWriter(buf, engine='xlsxwriter') as wr: res.to_excel(wr, index=False)
     st.download_button("📥 DESCARGAR EXCEL", buf.getvalue(), f"{sel}.xlsx")
+
 
 
 

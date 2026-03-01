@@ -313,7 +313,7 @@ elif vista == "🎉 MENÚS Y OCIO":
     st.link_button("📲 AVISAR ALERGIAS", "https://wa.me/34670379925?text=Tengo%20una%20alergia...")
 
 elif vista == "🏛️ ASAMBLEA":
-    st.markdown('<div class="socio-card"><h1 style="margin:0; font-size: 32px;">🏛️ ASAMBLEA GENERAL</h1><p style="margin:0; color: white; font-size: 18px;">ACCESO RESTRINGIDO A SOCIOS</p></div>', unsafe_allow_html=True)
+    st.markdown('<div class="socio-card"><h1 style="margin:0; font-size: 32px;">🏛️ ASAMBLEA GENERAL</h1><p style="margin:0; color: white; font-size: 18px;">ACCESO RESTRINGIDO A MZB</p></div>', unsafe_allow_html=True)
     
     password = st.text_input("Introduce la clave de Socio:", type="password", key="pass_final")
     
@@ -387,6 +387,7 @@ else: # MZB o Proveedor
     buf = io.BytesIO()
     with pd.ExcelWriter(buf, engine='xlsxwriter') as wr: res.to_excel(wr, index=False)
     st.download_button("📥 DESCARGAR EXCEL", buf.getvalue(), f"{sel}.xlsx")
+
 
 
 

@@ -154,11 +154,11 @@ st.markdown("""
 # --- MENSAJE DE BIENVENIDA (MODAL CORREGIDO) ---
 @st.dialog("🤝 ¡JUNTOS SOMOS MAS FUERTES! - EXPOOL 2026")
 def bienvenida():
-    st.write("Para llevar tu agenda siempre a mano, añade esta App a tu móvil:")
+    st.write("FE DE ERRATAS")
     st.markdown("""
-    1. Pulsa los **3 puntos** (en Android) o el botón **Compartir** (en iPhone).
-    2. Selecciona **'Añadir a pantalla de inicio'**.
-    3. ¡Listo! Ya tendrás el icono de EXPOOL con el resto de tus Apps.
+    1. Tal vez os aparezca algún proveedor/MZB repetidoal final del dia.
+    2. Esto es debido a que, al acabarse las visitas, entra en BUCLE y vuelve a empezar.
+    3. Aprovechar a hacer o recibir visitas rezagadas y cerrar los últimos acuerdos.
     """)
     if st.button("¡ENTENDIDO!"):
         st.session_state.visto = True
@@ -387,6 +387,7 @@ else: # MZB o Proveedor
     buf = io.BytesIO()
     with pd.ExcelWriter(buf, engine='xlsxwriter') as wr: res.to_excel(wr, index=False)
     st.download_button("📥 DESCARGAR EXCEL", buf.getvalue(), f"{sel}.xlsx")
+
 
 
 

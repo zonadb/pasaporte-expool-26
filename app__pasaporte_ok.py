@@ -157,8 +157,9 @@ def bienvenida():
     st.write("FE DE ERRATAS")
     st.markdown("""
     1. Tal vez os aparezca algún proveedor/MZB repetidoal final del dia.
-    2. Esto es debido a que, al acabarse las visitas, entra en BUCLE y vuelve a empezar.
+    2. Esto es debido a que, al acabarse las visitas, la app entra en BUCLE y vuelve a empezar.
     3. Aprovechar a hacer o recibir visitas rezagadas y cerrar los últimos acuerdos.
+    4. IMPORTANTE PROVEEDORES: Recordar traer los regalos AL STAND ZB, RECIBIRÉIS UN REGALO A CAMBIO
     """)
     if st.button("¡ENTENDIDO!"):
         st.session_state.visto = True
@@ -387,6 +388,7 @@ else: # MZB o Proveedor
     buf = io.BytesIO()
     with pd.ExcelWriter(buf, engine='xlsxwriter') as wr: res.to_excel(wr, index=False)
     st.download_button("📥 DESCARGAR EXCEL", buf.getvalue(), f"{sel}.xlsx")
+
 
 
 
